@@ -1,0 +1,46 @@
+<!-- Nombre Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('nombre', 'Nombre:'); ?>
+
+    <?php echo Form::text('nombre', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Descripcion Field -->
+<div class="form-group col-sm-12 col-lg-12">
+    <?php echo Form::label('descripcion', 'Descripcion:'); ?>
+
+    <?php echo Form::textarea('descripcion', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Ajuste Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('ajuste', 'Ajuste:'); ?>
+
+    <?php echo Form::text('ajuste', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Cnt Cntgid Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('cnt_cntgid', 'Cnt Cntgid:'); ?>
+
+    <?php echo Form::text('cnt_cntgid', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Cnt Id Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('cnt_id', 'Cnt Id:'); ?>
+
+    <?php echo Form::text('cnt_id', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Submit Field -->
+<div class="form-group col-sm-12">
+    <?php echo Form::submit('Save', ['class' => 'btn btn-primary']); ?>
+
+    <a href="<?php echo route('cuentas.index'); ?>" class="btn btn-default">Cancel</a>
+</div>

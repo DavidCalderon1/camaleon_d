@@ -1,0 +1,62 @@
+<!-- Nombre Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('nombre', 'Nombre:'); ?>
+
+    <?php echo Form::text('nombre', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Descripcion Field -->
+<div class="form-group col-sm-12 col-lg-12">
+    <?php echo Form::label('descripcion', 'Descripcion:'); ?>
+
+    <?php echo Form::textarea('descripcion', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Ajuste Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('ajuste', 'Ajuste:'); ?>
+
+    <?php echo Form::text('ajuste', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Reqta Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('reqta', 'Reqta:'); ?>
+
+    <?php echo Form::text('reqta', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Estado Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('estado', 'Estado:'); ?>
+
+    <?php echo Form::text('estado', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Cntaux Scntid Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('cntaux_scntid', 'Cntaux Scntid:'); ?>
+
+    <?php echo Form::text('cntaux_scntid', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Cntaux Id Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('cntaux_id', 'Cntaux Id:'); ?>
+
+    <?php echo Form::text('cntaux_id', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Submit Field -->
+<div class="form-group col-sm-12">
+    <?php echo Form::submit('Save', ['class' => 'btn btn-primary']); ?>
+
+    <a href="<?php echo route('cuentaAuxiliars.index'); ?>" class="btn btn-default">Cancel</a>
+</div>

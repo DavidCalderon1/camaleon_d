@@ -1,0 +1,54 @@
+<!-- Nombre Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('nombre', 'Nombre:'); ?>
+
+    <?php echo Form::text('nombre', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Descripcion Field -->
+<div class="form-group col-sm-12 col-lg-12">
+    <?php echo Form::label('descripcion', 'Descripcion:'); ?>
+
+    <?php echo Form::textarea('descripcion', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Ajuste Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('ajuste', 'Ajuste:'); ?>
+
+    <?php echo Form::text('ajuste', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Scnt Nativa Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('scnt_nativa', 'Scnt Nativa:'); ?>
+
+    <?php echo Form::text('scnt_nativa', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Scnt Cntid Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('scnt_cntid', 'Scnt Cntid:'); ?>
+
+    <?php echo Form::text('scnt_cntid', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Scnt Id Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('scnt_id', 'Scnt Id:'); ?>
+
+    <?php echo Form::text('scnt_id', null, ['class' => 'form-control']); ?>
+
+</div>
+
+<!-- Submit Field -->
+<div class="form-group col-sm-12">
+    <?php echo Form::submit('Save', ['class' => 'btn btn-primary']); ?>
+
+    <a href="<?php echo route('subcuentas.index'); ?>" class="btn btn-default">Cancel</a>
+</div>

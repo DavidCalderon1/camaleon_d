@@ -1,0 +1,33 @@
+<table class="table table-responsive" id="subcuentas-table">
+    <thead>
+        <th>Nombre</th>
+        <th>Descripcion</th>
+        <th>Ajuste</th>
+        <th>Scnt Nativa</th>
+        <th>Scnt Cntid</th>
+        <th colspan="3">Action</th>
+    </thead>
+    <tbody>
+    <?php foreach($subcuentas as $subcuenta): ?>
+        <tr>
+            <td><?php echo $subcuenta->nombre; ?></td>
+            <td><?php echo $subcuenta->descripcion; ?></td>
+            <td><?php echo $subcuenta->ajuste; ?></td>
+            <td><?php echo $subcuenta->scnt_nativa; ?></td>
+            <td><?php echo $subcuenta->scnt_cntid; ?></td>
+            <td>
+                <?php echo Form::open(['route' => ['subcuentas.destroy', $subcuenta->scnt_id], 'method' => 'delete']); ?>
+
+                <div class='btn-group'>
+                    <a href="<?php echo route('subcuentas.show', [$subcuenta->scnt_id]); ?>" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-eye-open"></i></a>
+                    <a href="<?php echo route('subcuentas.edit', [$subcuenta->scnt_id]); ?>" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-edit"></i></a>
+                    <?php echo Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]); ?>
+
+                </div>
+                <?php echo Form::close(); ?>
+
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>

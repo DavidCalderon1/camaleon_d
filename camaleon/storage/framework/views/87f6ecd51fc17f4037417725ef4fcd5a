@@ -1,0 +1,35 @@
+<!-- Nombre Field -->
+<div class="form-group">
+    <?php echo Form::label('nombre', 'Nombre:'); ?>
+
+    <p><?php echo $cuentaClase->nombre; ?></p>
+</div>
+
+<!-- Descripcion Field -->
+<div class="form-group">
+    <?php echo Form::label('descripcion', 'Descripcion:'); ?>
+
+    <p><?php echo $cuentaClase->descripcion; ?></p>
+</div>
+
+<!-- Ajuste Field -->
+<div class="form-group">
+    <?php echo Form::label('ajuste', 'Ajuste:'); ?>
+
+    <p><?php echo $cuentaClase->ajuste; ?></p>
+</div>
+
+<!-- Cntc Naturaleza Field -->
+<div class="form-group">
+    <?php echo Form::label('cntc_naturaleza', 'Cntc Naturaleza:'); ?>
+
+    <p><?php echo $cuentaClase->cntc_naturaleza; ?></p>
+</div>
+
+<!-- Cntc Id Field -->
+<div class="form-group">
+    <?php echo Form::label('cntc_id', 'Cntc Id:'); ?>
+
+    <p><?php echo $cuentaClase->cntc_id; ?></p>
+</div>
+
