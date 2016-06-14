@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.principal')
 
 @section('content')
         <div class="row">
@@ -6,11 +6,11 @@
                 <h1 class="pull-left">Editar Clase</h1>
             </div>
         </div>
-
+		@include('flash::message')
         @include('core-templates::common.errors')
 
         <div class="row">
-            {!! Form::model($cuentaClase, ['route' => ['clases.update', $cuentaClase->cntc_id], 'method' => 'patch']) !!}
+            {!! Form::model($cuentaClase, ['route' => ['admin.datos.puc.clases.update', $cuentaClase->cntc_id], 'method' => 'patch']) !!}
 
             @include('cuentaClases.fields')
 

@@ -25,6 +25,12 @@ class UpdatesubcuentaRequest extends Request
      */
     public function rules()
     {
-        return subcuenta::$rules;
+        return [
+			'scnt_id' => 'required|min:100000|max:999999|integer',
+			'nombre' => 'required|max:255',
+			'ajuste' => 'required|max:10',
+			'scnt_nativa' => 'required|boolean',
+			'scnt_cntid' => 'required|max:4',
+        ];
     }
 }

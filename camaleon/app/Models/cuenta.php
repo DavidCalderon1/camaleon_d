@@ -51,6 +51,7 @@ class cuenta extends Model
     protected $primaryKey = 'cnt_id';
 
     public $fillable = [
+        'cnt_id',
         'nombre',
         'descripcion',
         'ajuste',
@@ -63,11 +64,11 @@ class cuenta extends Model
      * @var array
      */
     protected $casts = [
+        'cnt_id' => 'integer',
         'nombre' => 'string',
         'descripcion' => 'string',
         'ajuste' => 'string',
         'cnt_cntgid' => 'string',
-        'cnt_id' => 'string'
     ];
 
     /**
@@ -76,9 +77,9 @@ class cuenta extends Model
      * @var array
      */
     public static $rules = [
-        'nombre' => 'required',
-        'ajuste' => 'required',
-        'cnt_cntgid' => 'required',
-        'cnt_id' => 'required|unique:cuenta'
+        'cnt_id' => 'required|unique:cuenta|min:1000|max:9999|integer',
+        'nombre' => 'required|max:255',
+        'ajuste' => 'required|max:10',
+        'cnt_cntgid' => 'required|max:2',
     ];
 }

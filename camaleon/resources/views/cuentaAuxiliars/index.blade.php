@@ -1,8 +1,8 @@
-@extends('layouts.admin')
+@extends('layouts.principal')
 
 @section('content')
-        <h1 class="pull-left">cuenta_auxiliars</h1>
-        <a class="btn btn-primary pull-right" style="margin-top: 25px" href="{!! route('cuentaAuxiliars.create') !!}">Add New</a>
+        <h1 class="pull-left">Cuentas auxiliares</h1>
+        <a class="btn btn-primary pull-right" style="margin-top: 25px" href="{!! route('admin.datos.puc.cuentasAuxiliares.create') !!}">Agregar nueva</a>
 
         <div class="clearfix"></div>
 

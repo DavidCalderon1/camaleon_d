@@ -1,0 +1,51 @@
+Configurar ISS 7 
+
+1.  Activar o desactivar caracteristicas de windows
+2.  Seleccionar todo lo implicito en Internet Informacion Services
+3.  Abrir Administrador de Internet Informacion Services
+4.  Agregar sitio web, agregar nueva url, (ejemplo: urlsitio.com) (el sitio localhost esta por defecto)
+5.  Modificar el archivo "C:\Windows\System32\drivers\etc\hosts" agregando:
+	127.0.0.1       urlsitio.com
+6.  Listo
+7.  En la pagina principal abrir: Asignaciones de controlador
+	- Agregar asignacion de modulo
+		Solicitud de ruta: *.php
+		Modulo: FastCgiModule
+		Ejecutable: C:\[Path to PHP installation]\php-cgi.exe
+		Nombre: PHP_via_FastCGI
+8.  Habilitar el Examen de Directorios
+9.  En 'Documento Predeterminado' agregar los archivos index.php y default.php
+10.  Copiar el archivo php.ini-production en C:/windows y renombrarlo a php.ini
+11.  Habilitar y modificar las extenciones:
+	extension_dir = "C:\php\ext" // extension_dir = "ext"
+	upload_max_filesize = 
+	max_execution_time =
+	memory_limit =
+	display_errors =
+	extension=php_mbstring.dll
+	extension=php_mysql.dll
+	extension=php_mysqli.dll
+	extension=php_openssl.dll
+	extension=php_pdo_mysql.dll
+	extension=php_pdo_pgsql.dll
+	extension=php_pdo_sqlite.dll
+	date.timezone = "America/Bogota"
+	-----------//------------
+	extension_dir = "ext"
+	cgi.force_redirect = 0
+	cgi.fix_pathinfo = 1
+	fastcgi.impersonate = 1
+	fastcgi.logging = 0
+	extension=php_mbstring.dll
+	extension=php_exif.dll      ; Must be after mbstring as it depends on it
+	extension=php_mysql.dll
+	extension=php_mysqli.dll
+	extension=php_openssl.dll
+	extension=php_pdo_mysql.dll
+	date.timezone = "ENTER YOUR TIMEZONE HERE"
+	session.entropy_length = 32
+12.  En el caso de que no muestre los errores de php el servidor revizar:
+	- Turn Windows features on or off > Internet Information Services > World Wide Web Services > Common HTTP Features > [✓] HTTP Errors
+	- Error Pages -> 500 -> Edit Feature Settings -> "Detailed Error"
+13.  More recent versions of PHP are built with VC9, VC11 or VC14 (Visual Studio 2008, 2012 or 2015 compiler respectively) and include improvements in performance and stability.
+14.  

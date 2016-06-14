@@ -51,10 +51,11 @@ class cuenta_clase extends Model
     protected $primaryKey = 'cntc_id';
 
     public $fillable = [
+        'cntc_id',
         'nombre',
         'descripcion',
         'ajuste',
-        'cntc_naturaleza'
+        'cntc_naturaleza',
     ];
 
     /**
@@ -63,11 +64,11 @@ class cuenta_clase extends Model
      * @var array
      */
     protected $casts = [
+        'cntc_id' => 'integer',
         'nombre' => 'string',
         'descripcion' => 'string',
         'ajuste' => 'string',
         'cntc_naturaleza' => 'string',
-        'cntc_id' => 'string'
     ];
 
     /**
@@ -76,8 +77,9 @@ class cuenta_clase extends Model
      * @var array
      */
     public static $rules = [
-		'nombre' => 'required',
-        'ajuste' => 'required',
-        'cntc_id' => 'required|unique:cuenta_clase'
+        'cntc_id' => 'required|unique:cuenta_clase|min:1|max:9|integer',
+		'nombre' => 'required|max:255',
+        'ajuste' => 'required|max:10',
+		'cntc_naturaleza' => 'max:10',
     ];
 }

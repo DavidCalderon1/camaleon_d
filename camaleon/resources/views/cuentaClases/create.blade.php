@@ -1,16 +1,16 @@
-@extends('layouts.admin')
+@extends('layouts.principal')
 
 @section('content')
     <div class="row">
         <div class="col-sm-12">
-            <h1 class="pull-left">Crear Nueva Clase</h1>
+            <h1 class="pull-left">Crear nueva clase</h1>
         </div>
     </div>
-
+	
     @include('core-templates::common.errors')
 
     <div class="row">
-        {!! Form::open(['route' => 'clases.store']) !!}
+        {!! Form::open(['route' => 'admin.datos.puc.clases.store']) !!}
 
             @include('cuentaClases.fields')
 

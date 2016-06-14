@@ -25,6 +25,11 @@ class Updatecuenta_claseRequest extends Request
      */
     public function rules()
     {
-        return cuenta_clase::$rules;
+        return [
+			'cntc_id' => 'required|min:1|max:9|integer',
+            'nombre' => 'required|max:255',
+			'ajuste' => 'required|max:10',
+			'cntc_naturaleza' => 'max:10',
+        ];
     }
 }

@@ -4,11 +4,23 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-		{!!Html::style('css/metisMenu.min.css')!!}
-		{!!Html::style('css/sb-admin-2.css')!!}
-		{!!Html::style('css/font-awesome.min.css')!!}
+		<link rel="shortcut icon" href="{{{ '/menu_multilevel/img/logo-01.ico' }}}">
+		{!! Html::style('assets/css/bootstrap.css') !!}
+		{!!Html::style('menu1/css/metisMenu.min.css')!!}
+		{!!Html::style('menu1/css/sb-admin-2.css')!!}
+		{!!Html::style('menu1/css/font-awesome.min.css')!!}
+		{!!Html::style('menu1/css/style.css')!!}
 		
+		<!-- Fonts -->
+		<link href='//fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
+	 
+		
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
 	</head>
 	<body>
 		<div id="wrapper">
@@ -20,7 +32,7 @@
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="index.html">Camaleon Admin</a>
+					<a class="navbar-brand" href="">Camaleon Admin</a>
 				</div>
 				<ul class="nav navbar-top-links navbar-right">
 					 <li class="dropdown">
@@ -43,10 +55,10 @@
 								<a href="#"><span class="label label-primary">1</span><i class="fa fa-sort-amount-asc fa-fw"></i> Clase<span class="fa arrow"></span></a>
 								<ul class="nav nav-second-level">
 									<li>
-										<a href="{!!URL::to('/clases/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
+										<a href="{!!URL::to('/admin/datos/puc/clases/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
 									</li>
 									<li>
-										<a href="{!! URL::to('/clases ') !!}"><i class='fa fa-list-ol fa-fw'></i> Clases</a>
+										<a href="{!! URL::to('/admin/datos/puc/clases ') !!}"><i class='fa fa-list-ol fa-fw'></i> Clases</a>
 									</li>
 								</ul>
 							</li>
@@ -54,10 +66,10 @@
 								<a href="#"><span class="label label-primary">2</span><i class="fa fa-sort-amount-asc fa-fw"></i> Grupo<span class="fa arrow"></span></a>
 								<ul class="nav nav-second-level">
 									<li>
-										<a href="{!!URL::to('/cuentaGrupos/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
+										<a href="{!!URL::to('/admin/datos/puc/grupos/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
 									</li>
 									<li>
-										<a href="{!!URL::to('/cuentaGrupos')!!}"><i class='fa fa-list-ol fa-fw'></i> Grupos</a>
+										<a href="{!!URL::to('/admin/datos/puc/grupos')!!}"><i class='fa fa-list-ol fa-fw'></i> Grupos</a>
 									</li>
 								</ul>
 							</li>
@@ -65,10 +77,10 @@
 								<a href="#"><span class="label label-primary">4</span><i class="fa fa-sort-amount-asc fa-fw"></i> Cuenta<span class="fa arrow"></span></a>
 								<ul class="nav nav-second-level">
 									<li>
-										<a href="{!!URL::to('/cuentas/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
+										<a href="{!!URL::to('/admin/datos/puc/cuentas/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
 									</li>
 									<li>
-										<a href="{!!URL::to('/cuentas')!!}"><i class='fa fa-list-ol fa-fw'></i> Cuentas</a>
+										<a href="{!!URL::to('/admin/datos/puc/cuentas')!!}"><i class='fa fa-list-ol fa-fw'></i> Cuentas</a>
 									</li>
 								</ul>
 							</li>
@@ -76,10 +88,10 @@
 								<a href="#"><span class="label label-primary">6</span><i class="fa fa-sort-amount-asc fa-fw"></i> Subcuenta<span class="fa arrow"></span></a>
 								<ul class="nav nav-second-level">
 									<li>
-										<a href="{!!URL::to('/subcuentas/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
+										<a href="{!!URL::to('/admin/datos/puc/subcuentas/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
 									</li>
 									<li>
-										<a href="{!!URL::to('/subcuentas')!!}"><i class='fa fa-list-ol fa-fw'></i> Subcuentas</a>
+										<a href="{!!URL::to('/admin/datos/puc/subcuentas')!!}"><i class='fa fa-list-ol fa-fw'></i> Subcuentas</a>
 									</li>
 								</ul>
 							</li>
@@ -87,74 +99,25 @@
 								<a href="#"><span class="label label-primary">8</span><i class="fa fa-sort-amount-asc fa-fw"></i> Cuenta Auxiliar<span class="fa arrow"></span></a>
 								<ul class="nav nav-second-level">
 									<li>
-										<a href="{!!URL::to('/cuentaAuxiliars/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
+										<a href="{!!URL::to('/admin/datos/puc/cuentasAuxiliares/create')!!}"><i class='fa fa-plus fa-fw'></i> Agregar</a>
 									</li>
 									<li>
-										<a href="{!!URL::to('/cuentaAuxiliars')!!}"><i class='fa fa-list-ol fa-fw'></i> Cuentas Auxiliares</a>
+										<a href="{!!URL::to('/admin/datos/puc/cuentasAuxiliares')!!}"><i class='fa fa-list-ol fa-fw'></i> Cuentas Auxiliares</a>
 									</li>
 								</ul>
 							</li>
 						</ul>
 					</div>
-					
-					<div class="container">
-						<div class="row">
-							<h2 class="bold">Scrollable Menu</h2>
-							<div class="btn-group">
-								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">Scrollable Menu <span class="caret"></span></button>
-								<ul class="dropdown-menu scrollable-menu" role="menu">
-									<li><a href="#">Action</a></li>
-									<li><a href="#">Another action</a></li>
-									<li><a href="#">Something else here</a></li>
-									<li><a href="#">Action</a></li>
-									<li><a href="#">Another action</a></li>
-									<li><a href="#">Something else here</a></li>
-									<li><a href="#">Action</a></li>
-									<li><a href="#">Another action</a></li>
-									<li><a href="#">Something else here</a></li>
-									<li><a href="#">Action</a></li>
-									<li><a href="#">Another action</a></li>
-									<li><a href="#">Something else here</a></li>
-									<li><a href="#">Action</a></li>
-									<li><a href="#">Another action</a></li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					
-					<label id='choose' for='options'>Select options</label>
-					<br clear='all' />
-					<select id='options' size="10" style='display:none;'>
-						<option>asdasdasd</option>
-						<option>ttyyyy</option>
-						<option>asdasdasd</option>
-						<option>eeeee</option>
-						<option>ee</option>
-						<option>asdasdeeeasd</option>
-						<option>asdasdasd</option>
-						<option>asdasdasd</option>
-						<option>asdasdasd</option>
-						<option>asdasdasd</option>
-						<option>asdasdasd</option>
-						<option>asdasdasd</option>
-						<option>asdasdasd</option>
-						<option>dds</option>
-						<option>asdasdddasd</option>
-						<option>asdasddddasd</option>
-						<option>ddd</option>
-					</select>
-
-					
 				</div>
 			</nav>
 			<div id="page-wrapper">
 				@yield('content')
 			</div>
 		</div>
-		{!!Html::script('js/jquery.min.js')!!}
-		{!!Html::script('js/bootstrap.min.js')!!}
-		{!!Html::script('js/metisMenu.min.js')!!}
-		{!!Html::script('js/sb-admin-2.js')!!}
+		{!! Html::script('assets/js/jquery.min.js') !!}
+		{!! Html::script('assets/js/bootstrap.min.js') !!}
+		{!!Html::script('menu1/js/metisMenu.min.js')!!}
+		{!!Html::script('menu1/js/sb-admin-2.js')!!}
 		
 		@section('scripts')
 		

@@ -1,14 +1,14 @@
 <?php $__env->startSection('content'); ?>
     <div class="row">
         <div class="col-sm-12">
-            <h1 class="pull-left">Create New cuenta_grupo</h1>
+            <h1 class="pull-left">Crear nuevo grupo</h1>
         </div>
     </div>
-
+	
     <?php echo $__env->make('core-templates::common.errors', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
 
     <div class="row">
-        <?php echo Form::open(['route' => 'cuentaGrupos.store']); ?>
+        <?php echo Form::open(['route' => 'admin.datos.puc.grupos.store']); ?>
 
 
             <?php echo $__env->make('cuentaGrupos.fields', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
@@ -17,4 +17,4 @@
 
     </div>
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.admin', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+<?php echo $__env->make('layouts.principal', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

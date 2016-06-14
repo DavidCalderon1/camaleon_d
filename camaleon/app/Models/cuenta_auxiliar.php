@@ -61,6 +61,7 @@ class cuenta_auxiliar extends Model
     protected $primaryKey = 'cntaux_id';
 
     public $fillable = [
+        'cntaux_id',
         'nombre',
         'descripcion',
         'ajuste',
@@ -75,13 +76,13 @@ class cuenta_auxiliar extends Model
      * @var array
      */
     protected $casts = [
+        'cntaux_id' => 'string',
         'nombre' => 'string',
         'descripcion' => 'string',
         'ajuste' => 'string',
         'reqta' => 'boolean',
         'estado' => 'boolean',
         'cntaux_scntid' => 'string',
-        'cntaux_id' => 'string'
     ];
 
     /**
@@ -90,9 +91,11 @@ class cuenta_auxiliar extends Model
      * @var array
      */
     public static $rules = [
-		'nombre' => 'required',
-        'ajuste' => 'required',
-        'cntaux_scntid' => 'required',
-        'cntaux_id' => 'required|unique:cuenta_auxiliar'
+        'cntaux_id' => 'required|unique:cuenta_auxiliar|min:1000000000000000|max:9999999999999999|integer',
+		'nombre' => 'required|max:255',
+        'ajuste' => 'required|max:10',
+        'cntaux_scntid' => 'required|max:6',
+        'reqta' => 'boolean',
+        'estado' => 'boolean',
     ];
 }

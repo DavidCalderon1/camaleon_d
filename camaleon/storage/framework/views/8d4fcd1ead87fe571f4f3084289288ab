@@ -1,3 +1,10 @@
+<!-- Cnt Id Field -->
+<div class="form-group">
+    <?php echo Form::label('cnt_id', 'Id:'); ?>
+
+    <p><?php echo $cuenta->cnt_id; ?></p>
+</div>
+
 <!-- Nombre Field -->
 <div class="form-group">
     <?php echo Form::label('nombre', 'Nombre:'); ?>
@@ -7,7 +14,7 @@
 
 <!-- Descripcion Field -->
 <div class="form-group">
-    <?php echo Form::label('descripcion', 'Descripcion:'); ?>
+    <?php echo Form::label('descripcion', 'Descripción:'); ?>
 
     <p><?php echo $cuenta->descripcion; ?></p>
 </div>
@@ -21,15 +28,8 @@
 
 <!-- Cnt Cntgid Field -->
 <div class="form-group">
-    <?php echo Form::label('cnt_cntgid', 'Cnt Cntgid:'); ?>
+    <?php echo Form::label('cnt_cntgid', 'Grupo id:'); ?>
 
     <p><?php echo $cuenta->cnt_cntgid; ?></p>
-</div>
-
-<!-- Cnt Id Field -->
-<div class="form-group">
-    <?php echo Form::label('cnt_id', 'Cnt Id:'); ?>
-
-    <p><?php echo $cuenta->cnt_id; ?></p>
 </div>
 

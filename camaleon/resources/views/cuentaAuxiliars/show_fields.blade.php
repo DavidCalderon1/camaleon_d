@@ -1,3 +1,9 @@
+<!-- Cntaux Id Field -->
+<div class="form-group">
+    {!! Form::label('cntaux_id', 'Id:') !!}
+    <p>{!! $cuentaAuxiliar->cntaux_id !!}</p>
+</div>
+
 <!-- Nombre Field -->
 <div class="form-group">
     {!! Form::label('nombre', 'Nombre:') !!}
@@ -6,7 +12,7 @@
 
 <!-- Descripcion Field -->
 <div class="form-group">
-    {!! Form::label('descripcion', 'Descripcion:') !!}
+    {!! Form::label('descripcion', 'Descripción:') !!}
     <p>{!! $cuentaAuxiliar->descripcion !!}</p>
 </div>
 
@@ -18,7 +24,7 @@
 
 <!-- Reqta Field -->
 <div class="form-group">
-    {!! Form::label('reqta', 'Reqta:') !!}
+    {!! Form::label('reqta', 'Req. tercero/activo:') !!}
     <p>{!! $cuentaAuxiliar->reqta !!}</p>
 </div>
 
@@ -30,13 +36,6 @@
 
 <!-- Cntaux Scntid Field -->
 <div class="form-group">
-    {!! Form::label('cntaux_scntid', 'Cntaux Scntid:') !!}
+    {!! Form::label('cntaux_scntid', 'Subcuenta id:') !!}
     <p>{!! $cuentaAuxiliar->cntaux_scntid !!}</p>
 </div>
-
-<!-- Cntaux Id Field -->
-<div class="form-group">
-    {!! Form::label('cntaux_id', 'Cntaux Id:') !!}
-    <p>{!! $cuentaAuxiliar->cntaux_id !!}</p>
-</div>
-

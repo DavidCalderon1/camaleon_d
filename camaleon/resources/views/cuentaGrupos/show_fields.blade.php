@@ -1,3 +1,9 @@
+<!-- Cntg Id Field -->
+<div class="form-group">
+    {!! Form::label('cntg_id', 'Id:') !!}
+    <p>{!! $cuentaGrupo->cntg_id !!}</p>
+</div>
+
 <!-- Nombre Field -->
 <div class="form-group">
     {!! Form::label('nombre', 'Nombre:') !!}
@@ -6,7 +12,7 @@
 
 <!-- Descripcion Field -->
 <div class="form-group">
-    {!! Form::label('descripcion', 'Descripcion:') !!}
+    {!! Form::label('descripcion', 'Descripción:') !!}
     <p>{!! $cuentaGrupo->descripcion !!}</p>
 </div>
 
@@ -18,13 +24,7 @@
 
 <!-- Cntg Cntcid Field -->
 <div class="form-group">
-    {!! Form::label('cntg_cntcid', 'Cntg Cntcid:') !!}
+    {!! Form::label('cntg_cntcid', 'Clase id:') !!}
     <p>{!! $cuentaGrupo->cntg_cntcid !!}</p>
-</div>
-
-<!-- Cntg Id Field -->
-<div class="form-group">
-    {!! Form::label('cntg_id', 'Cntg Id:') !!}
-    <p>{!! $cuentaGrupo->cntg_id !!}</p>
 </div>
 

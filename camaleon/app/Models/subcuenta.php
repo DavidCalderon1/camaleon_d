@@ -56,6 +56,7 @@ class subcuenta extends Model
     protected $primaryKey = 'scnt_id';
 
     public $fillable = [
+        'scnt_id',
         'nombre',
         'descripcion',
         'ajuste',
@@ -69,12 +70,12 @@ class subcuenta extends Model
      * @var array
      */
     protected $casts = [
+        'scnt_id' => 'integer',
         'nombre' => 'string',
         'descripcion' => 'string',
         'ajuste' => 'string',
         'scnt_nativa' => 'boolean',
         'scnt_cntid' => 'string',
-        'scnt_id' => 'string'
     ];
 
     /**
@@ -83,9 +84,10 @@ class subcuenta extends Model
      * @var array
      */
     public static $rules = [
-		'nombre' => 'required',
-        'ajuste' => 'required',
-        'scnt_cntid' => 'required',
-        'scnt_id' => 'required|unique:subcuenta'
+		'scnt_id' => 'required|unique:subcuenta|min:100000|max:999999|integer',
+		'nombre' => 'required|max:255',
+		'ajuste' => 'required|max:10',
+		'scnt_nativa' => 'required|boolean',
+		'scnt_cntid' => 'required|max:4',
     ];
 }

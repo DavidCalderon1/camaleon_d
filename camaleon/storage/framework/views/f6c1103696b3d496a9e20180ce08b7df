@@ -1,6 +1,6 @@
 <?php $__env->startSection('content'); ?>
-        <h1 class="pull-left">subcuentas</h1>
-        <a class="btn btn-primary pull-right" style="margin-top: 25px" href="<?php echo route('subcuentas.create'); ?>">Add New</a>
+        <h1 class="pull-left">Subcuentas</h1>
+        <a class="btn btn-primary pull-right" style="margin-top: 25px" href="<?php echo route('admin.datos.puc.subcuentas.create'); ?>">Agregar nueva</a>
 
         <div class="clearfix"></div>
 
@@ -13,4 +13,4 @@
 
         
 <?php $__env->stopSection(); ?>
-<?php echo $__env->make('layouts.admin', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
+<?php echo $__env->make('layouts.principal', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

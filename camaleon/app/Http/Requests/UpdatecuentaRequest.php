@@ -25,6 +25,11 @@ class UpdatecuentaRequest extends Request
      */
     public function rules()
     {
-        return cuenta::$rules;
+        return [
+			'cnt_id' => 'required|min:1000|max:9999|integer',
+			'nombre' => 'required|max:255',
+			'ajuste' => 'required|max:10',
+			'cnt_cntgid' => 'required|max:2',
+        ];
     }
 }

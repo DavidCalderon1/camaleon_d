@@ -25,6 +25,13 @@ class Updatecuenta_auxiliarRequest extends Request
      */
     public function rules()
     {
-        return cuenta_auxiliar::$rules;
+        return [
+			'cntaux_id' => 'required|min:1000000000000000|max:9999999999999999|integer',
+			'nombre' => 'required|max:255',
+			'ajuste' => 'required|max:10',
+			'cntaux_scntid' => 'required|max:6',
+			'reqta' => 'boolean',
+			'estado' => 'boolean',
+        ];
     }
 }

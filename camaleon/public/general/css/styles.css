@@ -1,0 +1,15 @@
+/*-- estilos para es select que se convierte en scroll --*/
+
+.select_scroll .hover {
+    /*background-color: dodgerblue;*/
+    background-color: #0b84fb;
+    color: white;
+}
+
+.content .video {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    margin: auto;
+	margin-top: 10%;
+}

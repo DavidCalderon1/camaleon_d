@@ -1,3 +1,9 @@
+<!-- Scnt Id Field -->
+<div class="form-group">
+    {!! Form::label('scnt_id', 'Id:') !!}
+    <p>{!! $subcuenta->scnt_id !!}</p>
+</div>
+
 <!-- Nombre Field -->
 <div class="form-group">
     {!! Form::label('nombre', 'Nombre:') !!}
@@ -6,7 +12,7 @@
 
 <!-- Descripcion Field -->
 <div class="form-group">
-    {!! Form::label('descripcion', 'Descripcion:') !!}
+    {!! Form::label('descripcion', 'Descripción:') !!}
     <p>{!! $subcuenta->descripcion !!}</p>
 </div>
 
@@ -18,19 +24,13 @@
 
 <!-- Scnt Nativa Field -->
 <div class="form-group">
-    {!! Form::label('scnt_nativa', 'Scnt Nativa:') !!}
+    {!! Form::label('scnt_nativa', 'Nativa:') !!}
     <p>{!! $subcuenta->scnt_nativa !!}</p>
 </div>
 
 <!-- Scnt Cntid Field -->
 <div class="form-group">
-    {!! Form::label('scnt_cntid', 'Scnt Cntid:') !!}
+    {!! Form::label('scnt_cntid', 'Cuenta id:') !!}
     <p>{!! $subcuenta->scnt_cntid !!}</p>
-</div>
-
-<!-- Scnt Id Field -->
-<div class="form-group">
-    {!! Form::label('scnt_id', 'Scnt Id:') !!}
-    <p>{!! $subcuenta->scnt_id !!}</p>
 </div>
 

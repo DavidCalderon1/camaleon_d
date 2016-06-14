@@ -1,25 +1,27 @@
 <table class="table table-responsive" id="cuentaGrupos-table">
     <thead>
+        <th>Id</th>
         <th>Nombre</th>
-        <th>Descripcion</th>
+        <th>Descripción</th>
         <th>Ajuste</th>
-        <th>Cntg Cntcid</th>
-        <th colspan="3">Action</th>
+        <th>Clase id</th>
+        <th colspan="3">Acción</th>
     </thead>
     <tbody>
     <?php foreach($cuentaGrupos as $cuentaGrupo): ?>
         <tr>
+            <td><?php echo $cuentaGrupo->cntg_id; ?></td>
             <td><?php echo $cuentaGrupo->nombre; ?></td>
             <td><?php echo $cuentaGrupo->descripcion; ?></td>
             <td><?php echo $cuentaGrupo->ajuste; ?></td>
             <td><?php echo $cuentaGrupo->cntg_cntcid; ?></td>
             <td>
-                <?php echo Form::open(['route' => ['cuentaGrupos.destroy', $cuentaGrupo->cntg_id], 'method' => 'delete']); ?>
+                <?php echo Form::open(['route' => ['admin.datos.puc.grupos.destroy', $cuentaGrupo->cntg_id], 'method' => 'delete']); ?>
 
                 <div class='btn-group'>
-                    <a href="<?php echo route('cuentaGrupos.show', [$cuentaGrupo->cntg_id]); ?>" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-eye-open"></i></a>
-                    <a href="<?php echo route('cuentaGrupos.edit', [$cuentaGrupo->cntg_id]); ?>" class='btn btn-default btn-xs'><i class="glyphicon glyphicon-edit"></i></a>
-                    <?php echo Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-xs', 'onclick' => "return confirm('Are you sure?')"]); ?>
+                    <a href="<?php echo route('admin.datos.puc.grupos.show', [$cuentaGrupo->cntg_id]); ?>" class='btn btn-default btn-sm' title='Ver'><i class="glyphicon glyphicon-eye-open"></i></a>
+                    <a href="<?php echo route('admin.datos.puc.grupos.edit', [$cuentaGrupo->cntg_id]); ?>" class='btn btn-default btn-sm' title='Editar'><i class="glyphicon glyphicon-edit"></i></a>
+                    <?php echo Form::button('<i class="glyphicon glyphicon-trash"></i>', ['type' => 'submit', 'class' => 'btn btn-danger btn-sm', 'title' => 'Eliminar', 'onclick' => "return confirm('Esta seguro?')"]); ?>
 
                 </div>
                 <?php echo Form::close(); ?>

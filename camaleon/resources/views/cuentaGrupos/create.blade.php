@@ -1,16 +1,16 @@
-@extends('layouts.admin')
+@extends('layouts.principal')
 
 @section('content')
     <div class="row">
         <div class="col-sm-12">
-            <h1 class="pull-left">Create New cuenta_grupo</h1>
+            <h1 class="pull-left">Crear nuevo grupo</h1>
         </div>
     </div>
-
+	
     @include('core-templates::common.errors')
 
     <div class="row">
-        {!! Form::open(['route' => 'cuentaGrupos.store']) !!}
+        {!! Form::open(['route' => 'admin.datos.puc.grupos.store']) !!}
 
             @include('cuentaGrupos.fields')
 

@@ -142,7 +142,17 @@ return [
 		
         'cntc_id'               => 'Id de la clase',
         'cntg_id'               => 'Id del grupo',
-        'cntg_cntcid'           => 'Id de la clase',
+        'cnt_id'               	=> 'Id de la cuenta',
+        'scnt_id'               => 'Id de la subcuenta',
+        'cntaux_id'           	=> 'Id de la cuenta auxiliar',
+		
+        'cntg_cntcid'           => 'Clase Id',
+        'cnt_cntgid'        	=> 'Grupo Id',
+        'scnt_cntid'        	=> 'Cuenta Id',
+        'cntaux_scntid'        	=> 'Subcuenta Id',
+		
+        'scnt_nativa'        	=> 'Nativa',
+		
     ],
 
 ];

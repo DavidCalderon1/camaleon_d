@@ -51,11 +51,11 @@ class cuenta_grupo extends Model
     protected $primaryKey = 'cntg_id';
 
     public $fillable = [
+        'cntg_id',
         'nombre',
         'descripcion',
         'ajuste',
         'cntg_cntcid',
-        'cntg_id'
     ];
 
     /**
@@ -64,11 +64,11 @@ class cuenta_grupo extends Model
      * @var array
      */
     protected $casts = [
+        'cntg_id' => 'integer',
         'nombre' => 'string',
         'descripcion' => 'string',
         'ajuste' => 'string',
         'cntg_cntcid' => 'string',
-        'cntg_id' => 'string'
     ];
 
     /**
@@ -77,9 +77,9 @@ class cuenta_grupo extends Model
      * @var array
      */
     public static $rules = [
-        'nombre' => 'required|max:10',
+        'cntg_id' => 'required|unique:cuenta_grupo|min:10|max:99|integer',
+        'nombre' => 'required|max:255',
         'ajuste' => 'required|max:10',
         'cntg_cntcid' => 'required|max:1',
-        'cntg_id' => 'required|unique:cuenta_grupo|max:2'
     ];
 }

@@ -26,10 +26,10 @@ class Updatecuenta_grupoRequest extends Request
     public function rules()
     {
         return [
-            'nombre' => 'required|max:10',
+			'cntg_id' => 'required|min:10|max:99|integer',
+            'nombre' => 'required|max:255',
 			'ajuste' => 'required|max:10',
 			'cntg_cntcid' => 'required|max:1',
-			'cntg_id' => 'required|max:2',
         ];
     }
 }

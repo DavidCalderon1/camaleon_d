@@ -2162,7 +2162,7 @@
 	- crear la sub-vista /pelicula/forms/pelicula.blade.php
 		//en esta sub-vista se usa la variable $genres la cual contiene la lista de generos
 		//
-		<div class="form-group">
+		<div class="form-group"> 
 			{!!Form::label('nombre','Nombre:')!!}
 			{!!Form::text('name',null,['class'=>'form-control', 'placeholder'=>'Ingresa el Nombre de la pelicula'])!!}
 		</div>
@@ -2470,6 +2470,7 @@
 			{
 				$movie = Movie::find($id);
 				$movie->delete();
+				//elimina el archivo fisico 
 				\Storage::delete($movie->path);
 				Session::flash('message','Pelicula Eliminada Correctamente');
 				return Redirect::to('/pelicula');
@@ -2489,4 +2490,770 @@
 		}
 		...
 		// 
+
+//Enviar Correo
+	https://laravel.com/docs/5.2/mail
+	- laravel provee de algunos drivers, como son Mailgun, Mandrill, SparkPost o SES pero requieren de una cuenta en cada uno de ellos
+	- se va a usar la cuenta de gmail para enviar los correos
+	- configurar el email:
+		- archivo /config/mail.php
+			//
+			...
+			//se deja con smtp
+			'driver' => env('MAIL_DRIVER', 'smtp'),
+			...
+			//
+			// se asigna para trabajar con gmail.com
+			...
+			'host' => env('MAIL_HOST', 'smtp.gmail.com'),
+			...
+			//
+			//el puerto debe ser el 465
+			...
+			'port' => env('MAIL_PORT', 465),
+			...
+			//
+			//se especifica la direccion de correo y el nombre
+			...
+			'from' => ['address' => 'pepito_perez@gmail.com', 'name' => 'Pepito Perez'],
+			...
+			//
+			//se especifica como se va a encriptar, sera con ssl
+			...
+			'encryption' => env('MAIL_ENCRYPTION', 'ssl'),
+			...
+			//
+
+		- archivo enviroment, .env
+			//
+			...
+			//se colocan las credenciales correctas
+			MAIL_DRIVER=smtp
+			MAIL_HOST=smtp.gmail.com
+			MAIL_PORT=465
+			MAIL_USERNAME=pepito_perez@gmail.com
+			MAIL_PASSWORD='password123'
+			MAIL_ENCRYPTION=ssl
+			...
+			//
+			
+	- crear un controlador para el mail
+		php artisan make:controller MailController --resource
+		
+	- enrutar el controlador creado, routes.php
+		//
+		...
+		// direcciona a todos los metodos por defecto del controlador MailController
+		Route::resource('mail','MailController');
+		...
+		//
+			
+	- modificar la vista: vista /contacto.blade.php 
+		- incluir los mensajes de alerta
+			//
+			...
+			@include('alerts.success')
+			...
+			//
+		- modificar el formulario de contacto
+			//
+			...
+			<div class="contact-form">
+				{!!Form::open(['route'=>'mail.store','method'=>'POST'])!!}
+					<div class="col-md-6 contact-left">
+						{!!Form::text('name',null,['placeholder' => 'Nombre'])!!}
+						{!!Form::text('email',null,['placeholder' => 'Email'])!!}
+					</div>
+					<div class="col-md-6 contact-right">
+						{!!Form::textarea('mensaje',null,['placeholder' => 'Mensaje'])!!}
+					</div>
+					{!!Form::submit('SEND')!!}
+				 {!!Form::close()!!}
+			 </div>
+			...
+			//	
+		
+	- modificar el controlador MailController
+		- agregar librerias
+			//
+			...
+			//se incluyen para manejar el proceso de envio de correo
+			use Mail;
+			use Session;
+			use Redirect;
+			...
+			//
+		- metodo store
+			//
+			...
+			public function store(Request $request)
+			{
+				//se especifica un vista, emails.contact, y la informacion que se va a enviar
+				Mail::send('emails.contact',$request->all(), function($msj){
+					//se coloca el asunto
+					$msj->subject('Correo de Contacto');
+					//el correo de destino
+					$msj->to('pepito_perez@gmail.com');
+				});
+				Session::flash('message','Mensahe enviado correctamente');
+				return Redirect::to('contacto');
+			}
+			...
+			//
+	- crear la vista /emails/contact.blade.php   , se reciben los datos enviados por el formuario de contacto a traves del controlador MailController
+		//archivo
+		<!DOCTYPE html>
+		<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<title>Document</title>
+			</head>
+			<body>
+				<p><stron>Nombre: </stron>{!!$name!!}</p>
+				<p><stron>Correo: </stron>{!!$email!!}</p>
+				<p><stron>Mensaje: </stron>{!!$mensaje!!}</p>
+			</body>
+		</html>
+		//
+		
+	- al probar el funcionamiento saldran errores debido a que:
+		- hay que reiniciar la aplicacion
+		- la cuenta de correo de gmail no esta configurada para que permita el envio de correos de esta manera
+			- llegara un correo notificando que hay un inicio de sesion en otra aplicacion y se ha evitado dicho inicio
+			- en el correo hay un link de 'mas informacion' este lo llevara a una pagina que informa sobre permitir que aplicaciones menos seguras accedan a tu cuenta
+				https://support.google.com/accounts/answer/6010255
+			- en la pagina de informacion ir al enlace: Ve a la sección "Aplicaciones menos seguras" en Mi cuenta.
+				https://www.google.com/settings/security/lesssecureapps
+			- activar Acceso de aplicaciones menos seguras 
+			- si todo se ha hecho correctamente el formulario ya debe de funcionar
+		
+//Restablecer password
+	- se puede llevar a cabo esta tarea gracias al modulo de autenticacion que provee laravel
+	- se requiere que la aplicacion ya tenga configurada la opcion de enviar correos
+	- se debe generar una migracion predeterminada de laravel(en el caso de que ya no este hecha) 
+		- en la migracion se crea la tabla password_resets la cual tiene los campos email y token que se usaran para el restablecimiento de la contraseña
+		- normalmente esta migracion se lleva a cabo automaticamente al ingresar el comando:
+			php artisan migrate
+		- en el caso de que no suceda el archivo se llama '[fecha]_create_password_resets_table.php' el cual esta en /database/migrations/
+	
+	- crear las rutas hacia los controladores para restablecer los password
+		//archivo routes.php
+		...
+		//esto sirve para que se muestre una vista para poder especificar que cuenta de correo se va a asignar para restablecer el password
+		Route::get('password/email','Auth\PasswordController@getEmail');
+		Route::post('password/email','Auth\PasswordController@postEmail');
+		...
+		//
+		
+	- modificar la vista index.blade.php
+		// se coloca un enlace a la ruta configurada para restablecer la contraseña, justo debajo del formulario de inicio de sesion
+		...
+		{!!link_to('password/email', $title = 'Olvidaste tu contraseña?', $attributes = null, $secure = null)!!}
+		...
+		//
+		
+	- crear la vista /auth/password.blade.php , esta vista se crea para asignar el correo de restablecimiento
+		// se puede copiar y modificar el contenido de la vista contaco
+		@extends('layouts.principal')
+			@section('content')
+			@include('alerts.success')
+				<div class="contact-content">
+					<div class="top-header span_top">
+						<div class="logo">
+							<a href="/"><img src="images/logo.png" alt="" /></a>
+							<p>Movie Theater</p>
+						</div>
+					<div class="clearfix"></div>
+					</div>
+
+					<div class="main-contact">
+						 <h3 class="head">CONTACT</h3>
+						 <p>WE'RE ALWAYS HERE TO HELP YOU'</p>
+						 <div class="contact-form">
+							 {!!Form::open(['url' => '/password/email'])!!}
+								<div class="col-md-6 contact-left">
+									
+									{!!Form::text('email')!!}
+								</div>
+								
+								{!!Form::submit('Enviar link')!!}
+							 {!!Form::close()!!}
+						</div>
+					</div>
+				</div>
+			@endsection
+		//
+
+	- en el caso de tener la version 5.2 de laravel remitirse a la documentacion 
+		https://laravel.com/docs/5.2/authentication#resetting-passwords
+		- en la documentacion mencionan de la migracion y usar el comando:
+			php artisan make:auth
+		- el comando crea las vistas requeridas y funcionando correctamente
+		- sin embargo el metodo actual funciona correctamente, recuerden cerrar la sesion o hacer logout antes de probar los resultados
+	- en el caso de que el formulario se muestre sin estilos es necesario modificar el layout /layouts/principal.blade.php colocando un / al inicio de la url de cada llamado de js o css 
+	
+	- probar el formulario creado ingresar a la plagina y dar click en el enlace de 'Olvidaste tu contraseña?'
+		- escribir un email y enviarlo, segun sea el mensaje de error se determina que vista hace falta por crear
+		- puede ser /auth/emails/password.blade.php o /emails/password.blade.php
+	- crear la vista 
+		 /auth/emails/password.blade.php
+		//
+		Sigue el link para resetear tu password {{ url('password/reset/'.$token)}}
+		//
+	
+	- hay que tener en cuenta para las pruebas que solo los correos de los usuarios registrados en la aplicacion seran validos
+	
+	- agregar las rutas para recibir la confirmacion desde el email
+		//
+		...
+		//de esta manera se recibe la confirmacion del reset del password desde el correo enviado al email del usuario
+		//laravel redirecciona a la vista /auth/reset.blade.php
+		Route::get('password/reset/{token}','Auth\PasswordController@getReset');
+		Route::post('password/reset','Auth\PasswordController@postReset');
+		...
+		//
+		
+	- crear la vista /auth/reset.blade.php
+		//es una copia de la vista contacto, modificando el formulario y los campos, los cuales son tipicos para este tipo de acciones
+		@extends('layouts.principal')
+			@section('content')
+			@include('alerts.success')
+				<div class="contact-content">
+					<div class="top-header span_top">
+						<div class="logo">
+							<a href="index.html"><img src="/images/logo.png" alt="" /></a>
+							<p>Movie Theater</p>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+				<div class="main-contact">
+					 <h3 class="head">CONTACT</h3>
+					 <p>WE`RE ALWAYS HERE TO HELP YOU</p>
+					 <div class="contact-form">
+						 {!!Form::open(['url' => '/password/reset'])!!}
+							<div class="col-md-6 contact-left">
+								{!!Form::hidden('token',$token,null)!!}
+
+								{!!Form::text('email',null,['value' => "{{old('email')}}",'placeholder' => 'Email'] )!!}
+								
+								{!! Form::password('password', array('placeholder'=>'Contraseña') ) !!}
+								{!! Form::password('password_confirmation',['placeholder' => 'Confirmar Contraseña']) !!}
+							</div>
+							
+							{!!Form::submit('Restablecer contraseña')!!}
+						 {!!Form::close()!!}
+					</div>
+				</div>
+			@endsection
+		//
+		
+	- modificar el controlador /auth/PasswordController.php
+		- agregar los trait requeridos (version 5.2 de laravel)
+			//
+			...
+			//es requerido para el metodo resetPassword, en el caso de usar la version 5.2 de laravel
+			use Illuminate\Support\Str;
+			use Illuminate\Support\Facades\Auth;
+			...
+			//
+		- colocar el redireccionamiento de la aplicacion y copiar el metodo resetPassword del trait ResetsPasswords
+			//
+			...
+			//por defecto la configuracion de laravel y el reset password hace que se redireccione a la url /home pero como no lo tenemos asi entonces se debe especificar a cual
+			//el otro problema es que el la aplicacion se configuro para que encriptara el password y los procesos de laravel para el reset password lo encriptan tambien, entonces hay que crear el metodo por si mismo para que no lo encripte dos veces
+			// lo mencionado anteriormente se puede comprobar en los archivos de configuracion de auth y especificamente en el que usa el controlador PasswordController, el trait ResetsPasswords
+			// el archivo esta en: \vendor\laravel\framework\src\Illuminate\Foundation\Auth\ResetsPasswords.php
+			// entonces se copia la funcion resetPassword al controlador y se quita la instruccion de la encripcion
+			protected $redirectTo = '/admin';
+			
+			/*en la version 5.1 de laravel la funcion esta de esta manera
+			protected function resetPassword($user, $password){
+				$user->password = $password;
+				$user->save();
+				Auth::login($user);
+			}
+			*/
+			//asi esta la funcion en la version 5.2
+			protected function resetPassword($user, $password)
+			{
+				$user->forceFill([
+					'password' => $password,
+					'remember_token' => Str::random(60),
+				])->save();
+
+				Auth::guard($this->getGuard())->login($user);
+			}
+			...
+			//
+	
+	- segun la configuracion del trait ResetsPasswords los password deben ser de minimo 6 caracteres de longitud
+	
+//Deployment
+	- preparar la aplicacion para el despliegue
+	- verificar las urls de los archivos, dejarlas sin el prefijo http://localhost:8000
+	- se crearan seeders (sembradores), que su funcionalidad basicamente es la de insertar registros que la aplicacion va a necesitar de manera predeterminada o llenar la aplicacion de datos de prueba
+		https://laravel.com/docs/5.1/seeding
+		- los seeder estan almacenados en /database/seeds/ 
+			- se pueden ejecutar por linea de comando, segun lo requerido:
+				php artisan db:seed
+				php artisan db:seed --class=UserTableSeeder
+				php artisan migrate:refresh --seed
+				
+			- el comando php artisan db:seed ejecuta todos los seeder creados a los que se hizo el llamado en el metodo up() del seed DatabaseSeed.php
+				//
+				public function run()
+{
+					Model::unguard();
+
+					$this->call(UsersTableSeeder::class);
+					$this->call(PostsTableSeeder::class);
+					$this->call(CommentsTableSeeder::class);
+
+					Model::reguard();
+				}
+				//
+				
+	- crear un seeder llamado UserTableSeeder
+		php artisan make:seeder UserTableSeeder
+		
+	- modificar el seeder creado, UserTableSeeder
+		- archivo /database/seeds/UserTableSeeder.php
+			//
+			...
+			/**
+			 * Run the database seeds.
+			 *
+			 * @return void
+			 */
+			public function run()
+			{
+				// php artisan db:seed --class=UserTableSeeder
+				
+				DB::table('users')->insert([
+					'name' => 'Raul Palacios',
+					'email' => 'palacios.rauls02@gmail.com',
+					'password' => bcrypt('qwerty'),
+				]);
+			}
+			...
+			//
+		
+	- modificar el seeder DatabaseSeed
+		- archivo /database/seeds/DatabaseSeed.php
+			//
+			...
+			/**
+			 * Run the database seeds.
+			 *
+			 * @return void
+			 */
+			public function run()
+			{
+				// php artisan db:seed
+				
+				//en el caso de la version 5.2 de laravel las lineas Model::unguard(); y Model::reguard(); no son requeridas
+				Model::unguard();
+
+				$this->call(UsersTableSeeder::class);
+
+				Model::reguard();
+			}
+			...
+			//
+			
+	- para hacer el despliegue se puede usar una maquina virtual de MicrosoftAzure
+		
+	- datos de configuracion mostrados en el curso de video tutorial
+		user/pass: Admin2015
+		url: CinemaXXII.cloudapp.net
+		
+		- conexion por ssh
+			ssh Admin2015@104.44.140.85
+				password Admin2015
+			
+		- actualizar el servidor
+			sudo apt-get update
+			
+		- instalar el servidor apache
+			sudo apt-get install apache2
+				yes
+				
+		- instalar mysql con librerias adicionales
+			sudo apt-get install mysql-server libapache2-mod-auth-mysql php5-mysql
+			
+		- instalar php5 y la libreria mcrypt
+			sudo apt-get install php5 libapache2-mod-php5 php5-mcrypt
+				yes
+			
+		- instalar la extension curl
+			sudo apt-get install php5-curl
+			
+		- mediante curl instalar composer
+			curl -sS http://getcomposer.org/installer | php
+			
+		- hacer el composer global, moverlo
+			sudo mv composer.phar /usr/local/bin/composer
+			
+		- prueba de la instalacion de apache, crear el archivo info.php
+			cd /var/www/html/
+			sudo nano info.php
+				<?php
+					phpinfo.php
+				?>
+			//guardar los cambios
+		
+		- ir a la url del archivo creado (http://cinemaxxii.cloudapp.net/phpinfo.php) 
+			- se debera ver la informacion de php
+		
+		- activar el modo de sobreescritura del apache, para no tener problemas con en enrutado
+			cd /home/Admin2015/
+			sudo a2enmod rewrite
+			sudo service apache2 restart
+				password: Admin2015
+				
+		- instalar unzip para desempaquetar el proyecto que sera subido en formato .zip
+			sudo apt-get install unzip
+		
+		- enviar el proyecto comprimido en zip desde el equipo local hacia el servidor por medio de scp
+			- scp es un sistema seguro de transferencia de archivos que usa el protocolo ssh
+				scp laravel.zip Admin2015@104.44.140.85:/home/Admin2015
+					password: Admin2015
+					
+		- mover el archivo subido a la carpeta del apache
+			sudo mv laravel.zip /var/www/html/
+			
+		- descormprimir el archivo
+			cd /var/www/html/
+			sudo unzip laravel.php
+			
+		- dar permisos a la aplicacion
+			sudo chmod -R 755 laravel
+			sudo chmod -R 755 laravel/storage
+			sudo chmod -R 755 laravel/public/movies/
+			
+		- configurar el apache
+			sudo nano /etc/apache2/sites-enabled/000-default.conf
+			
+			- en el archivo buscar la linea: DocumentRoot /var/www/html
+			- reeplazarla por lo siguiente:
+				//
+				DocumentRoot /var/www/html/laravel/public
+				<Directory /var/www/html/laravel/public >
+					AllowOverrite All
+					RewriteEngine on
+					RewriteBase /var/www/html/laravel/public
+				</Directory>
+				//
+				//guardar los cambios
+				
+		- reiniciar el servidor apache
+			sudo service apache2 restart
+			
+		- al ingresar a la url de la aplicacion deberia estar funcionando correctamente
+		
+		- generar una clave para la aplicacion, en la raiz de la aplicacion ejecutar el comando
+			php artisan key:generate
+		- si muestra un error de permisos entonces situarse en el directorio /var/www/html y darle todos los premisos
+			sudo chmod -R 777 laravel
+				
+			- generar una clave para la aplicacion, en la raiz de la aplicacion ejecutar el comando
+				php artisan key:generate
+				
+		- realizar las migraciones
+			php artisan migrate
+			
+		- realizar la insercion de los datos
+			php artisan db:seed
+			
+		- ingresar a la aplicacion y realizar el login para comprobar que todo esta correcto
+		
+		- optimizar el proyecto, esto ayuda bastante para las aplicaciones que van lento
+			php artisan optimize
+			
+//seguridad
+	- laravel provee de componentes que hacen a una aplicacion segura
+	- laravel incorpora elementos en el core para hacer a una aplicacion segura
+	- componentes
+		form request: ayuda a validar la informacion que es enviada por el usuario, colocar reglas y restricciones
+		uso de middleware: permite filtrar a un usuario dependiendo de sus permisos
+	- componentes en el core:
+		- gracias a que laravel incorpora un ORM ya no se necesita preocuparse por la inyecciones sql (SQL Injection), gracias a que el ORM esta basado en una capa de objetos y no puede interpretar el lenguaje sql
+		- laravel incorpora un sistema de tokens los cuales mitigan el problema de los sitios cruzados 
+			- por ejemplo si vamos a un formulario de la aplicacion e inspeccionamos los elementos html veremos que el formulario tiene un campo oculto llamado _token el cual tiene una clave que viene siendo una credencial del formulario ante la aplicacion, esto evita que exista algun tipo de falsificacion
+		- proteccion frente al Cross-site scripting, evita la insercion de javascript
+			//esta instruccion esta 'escapando' el valor del dato es decir que no es interpretada
+			<td>{{$user->name}}</td>
+			//
+			//en cambio esta instruccion esta permitiendo la interpretacion del valor del dato es decir que si el valor tiene instrucciones html o javascript seran interpretadas por la aplicacion
+			<td>{!!$user->name!!}</td>
+			//
+		- para usuarios maliciosos 
+			- por ejemplo que aprovechan cosas como que en la url se vea el id del recurso que se esta editando http://localhost:8000/usuario/1/edit y que decidan estar cambiando ese numero 'a ver que pasa', hay una forma de manejarlo
+			- el los metodos de los controladores despues de buscar el elemento se agrega una validacion de que si no existe se ejecute un abort(404)
+				//
+				...
+				$movie = Movie::find($id);
+				if(! $movie ){
+					abort(404);
+				}
+				...
+				//
+				- en el caso de la version 5.1 de laravel, en el metodo find() se coloca dicha instruccion
+				//
+				...
+				public function find(Route $route){
+					//adminitido hasta la version 5.1.* de laravel
+					$this->movie = Movie::find($route->getParameter('pelicula'));
+					if(! $this->movie ){
+						abort(404);
+					}
+				}
+				...
+				//
+			- se crear una vista 404.blade.php en /errors/ en donde ya existe una vista 503.blade.php la cual se puede copiar y modificar
+				//
+				<!DOCTYPE html>
+					<html>
+						<head>
+							<title>Objeto no localizado.</title>
+
+							<link href="https://fonts.googleapis.com/css?family=Lato:100" rel="stylesheet" type="text/css">
+
+							<style>
+								html, body {
+									height: 100%;
+								}
+
+								body {
+									margin: 0;
+									padding: 0;
+									width: 100%;
+									color: #B0BEC5;
+									display: table;
+									font-weight: 100;
+									font-family: 'Lato';
+								}
+
+								.container {
+									text-align: center;
+									display: table-cell;
+									vertical-align: middle;
+								}
+
+								.content {
+									text-align: center;
+									display: inline-block;
+								}
+
+								.title {
+									font-size: 72px;
+									margin-bottom: 40px;
+								}
+							</style>
+						</head>
+						<body>
+							<div class="container">
+								<div class="content">
+									<div class="title">Objeto no localizado.</div>
+								</div>
+							</div>
+						</body>
+					</html>
+				//
+			- para no estar colocando las mismas lineas de codigo para el 404 en todos los controladores se puede crear un metodo en el controlador padre Controller.php
+				//
+				...
+				//este metodo se usara para mostrar una pagina 404 en el caso de no encontrar el recurso
+				//el parametro $value es la variable que almacena el resultado de la consulta
+				public function notFound($value){
+					if(! $value ){
+						abort(404);
+					}
+				}
+				...
+				//
+				
+				- luego las instrucciones que se colocaran en las busquedas seran mas simples
+					//
+					...
+					$this->notFound($movie);
+					...
+					//
+				- en el caso de la version 5.1 de laravel seria:
+					//
+					...
+					$this->notFound($this->movie);
+					...
+					//
+					
+//Selects Dinamicos
+	- se crearan nuevos modelos los cuales se usaran para el ejercicio, es un tipico caso de pais - departamento - ciudad o estado - municipio
+	
+	- crear los modelos State y Town
+		php artisan make:model State -m 
+		php artisan make:model Town -m 
+		
+	- modificar el archivo de migracion del modelo State, [fecha]_create_states_table.php
+		//agregar el campo name
+		...
+		$table->string('name');
+		...
+		//
+		
+	- modificar el archivo de migracion del modelo Town, [fecha]_create_towns_table.php
+		//agregar el campo name y la llave foranea hacia la tabla states
+		...
+		$table->string('name');
+		$table->integer('state_id')->unsigned();
+		$table->foreign('state_id')->references('id')->on('states');
+		...
+		//
+		
+	- correr las migraciones
+		php artisan migrate
+
+	- modificar el modelo State, agregar la variable de la tabla y los campos fillables
+		//
+		...
+		protected $table = 'states';
+	
+		protected $fillable = ['name'];
+		...
+		//
+
+	- modificar el modelo Town, agregar la variable de la tabla y los campos fillables
+		//
+		...
+		protected $table = 'towns';
+	
+		protected $fillable = ['name','state_id'];
+		...
+		//
+		
+	- crear el layout /layouts/master.blade.php 
+		//
+		<!DOCTYPE html>
+		<html lang="en">
+			<head>
+				<meta charset="utf-8">
+				<title>Document</title>
+			</head>
+			<body>
+				@yield('content')
+				
+				{!!Html::script('/js/jquery.min.js')!!}
+				{!!Html::script('/js/dropdown.js')!!}
+			</body>
+		</html>
+		//
+	
+	- hacer uso de laravelcollective, instalarlo
+		https://laravelcollective.com/docs/5.2/html
+		
+	- crear una vista /state/index.blade.php
+		//
+		@extends('layouts.master')
+			@section('content')
+				{!!Form::select('state',$states, null,['id' => 'state']) !!}
+				{!!Form::select('town',['placeholder' => 'Seleccione un municipio'], null, ['id' => 'town'])!!}
+			@endsection	
+		//
+		
+	- crear el controlador StateController
+		php artisan make:controller StateController --resource
+		
+	- crear la ruta hacia el controlador StateController
+		//
+		...
+		// direcciona a todos los metodos por defecto del controlador StateController para los selects dinamicos 
+		Route::resource('states','StateController');
+		...
+		//
+		
+	- modificar el controlador StateController, 
+		- hacer el llamado a los modelos State y Town
+			//
+			...
+			use Cinema\State;
+			use Cinema\Town;
+			...
+			//
+		- modificar el metodo index
+			//
+			...
+			public function index()
+			{
+				$states = State::lists('name','id');
+				return view('state.index',compact('states') );
+			}
+			...
+			//
+		- crear el metodo getTowns
+			//
+			...
+			//metodo para obtener el id segun la opcion elejida en el select de estados, se valida mediante ajax
+			public function getTowns(Request $request, $id){
+				if($request->ajax()){
+					//se obtiene el resultado de la busqueda de todos los municipios a partir de id del estado elegido y se regresan los registros resultantes
+					$towns = Town::towns($id);
+					return response()->json($towns);
+				}
+			}
+			...
+			//
+			
+	- insertar datos de prueba en las tablas states y towns
+	
+	- modificar el modelo Town, agregar un metodo para lanzar los datos de los municipios
+		//
+		...
+		//retorna todos los estados correspondientes a partir del state_id recibido 
+		public static function towns($id){
+			return Town::where('state_id','=',$id)->get();
+		}
+		...
+		//
+		
+	- crear la ruta hacia el metodo getTowns del controlador StateController
+		//
+		...
+		// direcciona al metodo getTowns del controlador StateController para los selects dinamicos 
+		Route::get('towns/{id}','StateController@getTowns');
+		...
+		//
+		
+	- crear el script /js/dropdown.js con las instrucciones para hacer funcionar el select dinamico
+		- de esta manera seria con jquery normal y ecmascript 5
+			//
+			$("#state").change(function(event){
+				//se obtiene el componente en el cual se esta generando el evento
+				//se obtiene el id (event.target.value) y se envia concatenado a la url towns/[id]
+				//esta peticion tendra una respuesta y un estado
+				$.get("towns/"+event.target.value+"", function(response, state){
+					//se puede ver que es lo que esta recibiendo
+						//console.log(response);
+					//se limpia el elemento antes de insertar la informacion
+					$("#town").empty();
+					//se insertan los elementos recibidos con formato de option dentro del select#town
+					for(i=0; i<response.length; i++){
+						$("#town").append('<option value="'+ response[i].id +'">'+ response[i].name +'</option>');
+					}
+				});
+			});
+			//
+		- de esta otra es usando jquery-2.1.0.min.js con ecmascript 6
+			https://www.uno-de-piera.com/ecmascript-6-el-cambio-de-javascript/
+			//
+			$("#state").change(event => {
+				$.get(`towns/${event.target.value}`, function(res, sta){
+					$("#town").empty();
+					res.forEach(element => {
+						$("#town").append(`<option value=${element.id}> ${element.name} </option>`);
+					});
+				});
+			});
+			//
+//FIN DEL CURSO
+https://github.com/RpL02
 ?>

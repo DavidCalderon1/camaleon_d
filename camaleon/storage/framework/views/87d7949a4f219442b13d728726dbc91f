@@ -1,3 +1,11 @@
+<!-- Cntc Id Field -->
+<div class="form-group col-sm-6">
+    <?php echo Form::label('cntc_id', 'Id:'); ?>
+
+    <?php echo Form::number('cntc_id', null, ['class' => 'form-control']); ?>
+
+</div>
+
 <!-- Nombre Field -->
 <div class="form-group col-sm-6">
     <?php echo Form::label('nombre', 'Nombre:'); ?>
@@ -7,8 +15,8 @@
 </div>
 
 <!-- Descripcion Field -->
-<div class="form-group col-sm-12 col-lg-12">
-    <?php echo Form::label('descripcion', 'Descripcion:'); ?>
+<div class="form-group col-sm-10 col-lg-10">
+    <?php echo Form::label('descripcion', 'Descripción:'); ?>
 
     <?php echo Form::textarea('descripcion', null, ['class' => 'form-control']); ?>
 
@@ -18,7 +26,7 @@
 <div class="form-group col-sm-6">
     <?php echo Form::label('ajuste', 'Ajuste:'); ?>
 
-    <?php echo Form::text('ajuste', null, ['class' => 'form-control']); ?>
+    <?php echo Form::select('ajuste', array('MENSUAL' => 'MENSUAL','ANUAL' => 'ANUAL'), null, ['class' => 'form-control ', 'placeholder' => 'Seleccione el ajuste']); ?>
 
 </div>
 
@@ -30,17 +38,10 @@
 
 </div>
 
-<!-- Cntc Id Field -->
-<div class="form-group col-sm-6">
-    <?php echo Form::label('cntc_id', 'Id:'); ?>
-
-    <?php echo Form::text('cntc_id', null, ['class' => 'form-control']); ?>
-
-</div>
 
 <!-- Submit Field -->
 <div class="form-group col-sm-12">
     <?php echo Form::submit('Guardar', ['class' => 'btn btn-primary']); ?>
 
-    <a href="<?php echo route('clases.index'); ?>" class="btn btn-default">Cancelar</a>
+    <a href="<?php echo route('admin.datos.puc.clases.index'); ?>" class="btn btn-default">Cancelar</a>
 </div>
