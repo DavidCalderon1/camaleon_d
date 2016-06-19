@@ -10,11 +10,6 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-/*
-Route::get('/', function () {
-    return view('welcome');
-});
-*/
 
 /*
 |--------------------------------------------------------------------------
@@ -30,9 +25,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'API'], function () {
 
 /*rutas del api generador*/
 Route::get('generator_builder', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@builder');
-
 Route::get('field_template', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@fieldTemplate');
-
 Route::post('generator_builder/generate', '\InfyOm\GeneratorBuilder\Controllers\GeneratorBuilderController@generate');
 
 /*rutas de la aplicacion camaleon*/
@@ -45,54 +38,31 @@ Route::group(['prefix' => '/admin', 'namespace' => 'Admin'], function() {
 	Route::get('/', function () {
 		return view('layouts.default', ['site' => 'Administración']);
 	});
-	Route::group(['prefix' => 'datos', 'namespace' => 'Datos'],function() {
+	//devuelve una pagina por defecto si no se ingresa una url correcta
+	Route::group([
+		'prefix' => 'puc',
+		'namespace' => 'Puc'
+		//'as' => 'puc',
+	], function() {
 		//devuelve una pagina por defecto si no se ingresa una url correcta
 		Route::get('/', function () {
-			return view('layouts.default', ['site' => 'Datos y Variables']);
+			return view('layouts.default', ['site' => 'Plan Único de Cuentas']);
 		});
-		Route::group([
-			'prefix' => 'puc',
-			'namespace' => 'Puc'
-			//'as' => 'puc',
-		], function() {
-			//devuelve una pagina por defecto si no se ingresa una url correcta
-			Route::get('/', function () {
-				return view('layouts.default', ['site' => 'Plan Único de Cuentas']);
-			});
-			// /admin/datos/puc/
-			//admin.datos.puc.clases 
-			Route::resource('clases', 'puc_claseController');
-			
-			//admin.datos.puc.grupos 
-			//Route::resource('grupos', 'cuenta_grupoController');
-			//admin.datos.puc.cuentas 
-			//Route::resource('cuentas', 'cuentaController');
-			//admin.datos.puc.subcuentas 
-			//Route::resource('subcuentas', 'subcuentaController');
-			//admin.datos.puc.cuentasAuxiliares 
-			//Route::resource('cuentasAuxiliares', 'cuenta_auxiliarController');
-			
-		});
+		// /admin/puc/
+		//admin.puc.clases 
+		Route::resource('clases', 'puc_claseController');
+		//admin.puc.grupos 
+		Route::resource('grupos', 'puc_grupoController');
+		//admin.puc.cuentas 
+		Route::resource('cuentas', 'puc_cuentaController');
+		//admin.puc.subcuentas 
+		Route::resource('subcuentas', 'puc_subcuentaController');
+		//admin.puc.cuentasauxiliares 
+		Route::resource('cuentasauxiliares', 'puc_cuentaauxiliarController');
 	});
 });
 
 /*rutas de prueba*/
-
-/*
-Route::group([
-	'prefix' => '/admin/datos/puc',
-	
-], function() {
-	Route::resource('clases', 'cuenta_claseController');
-	// Define Routes Here
-});
-*/
-
-/*
-Route::get('/admin/datos/puc', array(
-    'as' => 'puc',
-));
-*/
 
 /*
 //Route::resource('clases', 'cuenta_claseController', ['as' => 'puc.clases']);
@@ -118,37 +88,7 @@ Route::group(['prefix' => '/dfasdfa/dlkasdf/puc2222/'], function () {
     });
 });
 */
-/*
-Route::get('/my/long/calendar/puc/{tipo}', function($puc_type)
-{
-	//['uses' => 
-//(
-	switch($puc_type) {
-        case 'clases':
-			'cuenta_claseController@index'
-			//return Redirect::action('cuenta_claseController@index');
-			//Route::get('cuenta_claseController@index');
-            //return View::make('cuentaClases.index');
-			//return route('cuenta_claseController@index');
-            //return Redirect::route('clases.index');
-			//return View::make('clases');
-            break;
-        case 'manager':
-            //$this->profile = $this->adminProfile();
-            break;
-        case 'admin':
-            //$this->profile = $this->adminProfile();
-            break;
-        case 'student':
-            //$this->profile = $this->studentProfile();
-            break;
-        case 'staff':
-            
-			//return View::make('calendar');
-            break;
-    }
-});
-*/
+
 /*
 Route::get('/my/long/calendar/route/{puc}', function($puc_type)
 {
@@ -177,9 +117,3 @@ Route::get('/my/long/calendar/route/{puc}', function($puc_type)
     }
 });
 */
-
-
-Route::resource('grupos', 'puc_grupoController');
-Route::resource('cuentas', 'puc_cuentaController');
-Route::resource('subcuentas', 'puc_subcuentaController');
-Route::resource('cuentasauxiliares', 'puc_cuentaauxiliarController');

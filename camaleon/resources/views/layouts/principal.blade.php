@@ -57,50 +57,37 @@
 			<button class="action action--close" aria-label="Close Menu"><span class="icon icon--cross"></span></button>
 			<div class="menu__wrap">
 				<ul data-menu="main" class="menu__level">
-					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1" href="{!!URL::to('/admin')!!}">Administración</a></li>
+					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1" href="{!!URL::to('/admin')!!}">Módulo Administrativo</a></li>
 					<li class="menu__item"><a class="menu__link" data-submenu="submenu-2" href="#">Fruits</a></li>
 					<li class="menu__item"><a class="menu__link" data-submenu="submenu-3" href="#">Grains</a></li>
 					<li class="menu__item"><a class="menu__link" data-submenu="submenu-4" href="#">Mylk &amp; Drinks</a></li>
 					<!--li class="menu__item"><a class="menu__link" data-submenu="submenu-5" href="#">Mylk &amp; Grains 5</a></li-->
-					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-1-1" href="#">Mylk &amp; Grains 5</a></li>
+					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-1" href="#">Mylk &amp; Grains 5</a></li>
 				</ul>
 				<!-- Submenu 1 -->
 				<ul data-menu="submenu-1" class="menu__level">
-					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-1" href="{!!URL::to('/admin/datos')!!}">Datos y variables</a></li>
+					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-1" href="{!!URL::to('/admin/puc')!!}">Manejo de Plan Único de Cuentas</a></li>
 					<li class="menu__item"><a class="menu__link" href="#">Roots &amp; Seeds</a></li>
 					<li class="menu__item"><a class="menu__link" href="#">Cabbages</a></li>
 					<li class="menu__item"><a class="menu__link" href="#">Salad Greens</a></li>
 					<li class="menu__item"><a class="menu__link" href="#">Mushrooms</a></li>
 					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-6" href="#">Sale %</a></li>
 				</ul>
+				<!-------------------------------------------------->
+				<!-------------------------------------------------->
 				<!-- Submenu 1-1 -->
-				<ul data-menu="submenu-1-1" class="menu__level">
-					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-1-1" href="{!!URL::to('/admin/datos/puc')!!}">PUC</a></li>
-					<li class="menu__item"><a class="menu__link" href="#">Dried Veggies</a>
-						<ul data-menu="" class="">
-							<li class=""><a class="" href="#">Fair Trade Roots</a></li>
-							<li class=""><a class="menu__link" href="#">Dried Veggies</a></li>
-							<li class=""><a class="menu__link" href="#">Our Brand</a></li>
-							<li class=""><a class="menu__link" data-submenu="submenu-1-6-4" href="#">Homemade</a></li>
-						</ul>
-					</li>
-					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-6-3" href="#">Our Brand</a></li>
-					<li class="menu__item"><a class="menu__link" data-submenu="submenu-1-6-4" href="#">Homemade</a></li>
-				</ul>
-				<!-------------------------------------------------->
-				<!-------------------------------------------------->
-				<!-- Submenu 1-1-1 -->
-				<ul data-menu="submenu-1-1-1" class="menu__level" >
+				<ul data-menu="submenu-1-1" class="menu__level" >
+					<li class="menu__item"><a class="menu__link" href="#"><i class='glyphicon glyphicon-search btn-xs'></i> Buscar</a></li>
 					<li class="menu__item menu__item_dropdown dropdown_parent">
 						<div class="menu__link_dropdown a">
 							<i class="glyphicon glyphicon-sort-by-attributes btn-xs"><span class="btn-xs">1</span></i>Clase<span class="btn-xs pull-right"><span class="caret "></span></span>
 						</div>
 						<ul class="dropdown_child">
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!!URL::to('/admin/datos/puc/clases/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
+								<a class="menu__link" href="{!!URL::to('/admin/puc/clases/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
 							</li>
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!! URL::to('/admin/datos/puc/clases ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Clases</a>
+								<a class="menu__link" href="{!! URL::to('/admin/puc/clases ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Clases</a>
 							</li>
 						</ul>
 					</li>
@@ -110,10 +97,10 @@
 						</div>
 						<ul class="dropdown_child">
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!!URL::to('/admin/datos/puc/grupos/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
+								<a class="menu__link" href="{!!URL::to('/admin/puc/grupos/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
 							</li>
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!! URL::to('/admin/datos/puc/grupos ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Grupos</a>
+								<a class="menu__link" href="{!! URL::to('/admin/puc/grupos ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Grupos</a>
 							</li>
 						</ul>
 					</li>
@@ -123,10 +110,10 @@
 						</div>
 						<ul class="dropdown_child">
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!!URL::to('/admin/datos/puc/cuentas/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
+								<a class="menu__link" href="{!!URL::to('/admin/puc/cuentas/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
 							</li>
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!! URL::to('/admin/datos/puc/cuentas ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Cuentas</a>
+								<a class="menu__link" href="{!! URL::to('/admin/puc/cuentas ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Cuentas</a>
 							</li>
 						</ul>
 					</li>
@@ -136,23 +123,23 @@
 						</div>
 						<ul class="dropdown_child">
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!!URL::to('/admin/datos/puc/subcuentas/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
+								<a class="menu__link" href="{!!URL::to('/admin/puc/subcuentas/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
 							</li>
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!! URL::to('/admin/datos/puc/subcuentas ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Subcuentas</a>
+								<a class="menu__link" href="{!! URL::to('/admin/puc/subcuentas ') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Subcuentas</a>
 							</li>
 						</ul>
 					</li>
 					<li class="menu__item menu__item_dropdown dropdown_parent">
 						<div class="menu__link_dropdown a">
-							<i class="glyphicon glyphicon-sort-by-attributes btn-xs"><span class="btn-xs">16</span></i>Cuenta Auxiliar<span class="btn-xs pull-right"><span class="caret "></span></span>
+							<i class="glyphicon glyphicon-sort-by-attributes btn-xs"><span class="btn-xs">10</span></i>Cuenta Auxiliar<span class="btn-xs pull-right"><span class="caret "></span></span>
 						</div>
 						<ul class="dropdown_child">
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!!URL::to('/admin/datos/puc/cuentasAuxiliares/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
+								<a class="menu__link" href="{!!URL::to('/admin/puc/cuentasauxiliares/create')!!}"><i class='glyphicon glyphicon-plus btn-xs'></i> Agregar</a>
 							</li>
 							<li class="menu__item_dropdown">
-								<a class="menu__link" href="{!! URL::to('/admin/datos/puc/cuentasAuxiliares') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Cuentas Auxiliares</a>
+								<a class="menu__link" href="{!! URL::to('/admin/puc/cuentasauxiliares') !!}"><i class='glyphicon glyphicon-list btn-xs'></i> Cuentas Auxiliares</a>
 							</li>
 						</ul>
 					</li>

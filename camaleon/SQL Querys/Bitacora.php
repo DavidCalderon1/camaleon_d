@@ -1,4 +1,37 @@
 Laravel proyecto camaleon
+- requisitos segun los casos de uso
+	- crear, actualizar y eliminar  grupos, cuentas, subcuentas y cuentas auxiliares
+	- ver clases, grupos, cuentas, subcuentas y cuentas auxiliares
+	- en los formularios colocar primero el campo codigo referente a la cuenta padre
+	- la ruta en la interfaz para la creacion es:  'Módulo Administrativo > Manejo de Plan Único de Cuentas > Creación de cuenta
+	- la ruta en la url para la creacion es: /admin/puc/.../create
+	- despues de la creacion y actualizacion de un registro mostrar la vista de la informacion registrada
+	- agregar validaciones y autenticacion, ocultar los accesos por interfaz e impedirlo por url, debera estar registrado y con permisos
+	- en la busqueda del puc requerir el tipo de cuenta y con un solo campo de texto buscar por codigo y nombre
+	- la ruta en la interfaz para la busqueda es:  'Módulo Administrativo > Manejo de Plan Único de Cuentas > Busqueda de cuenta'
+	- la ruta en la url para la busqueda es: /admin/puc/.../search
+	- mostrar un mensaje de que no existen registros de acuerdo a la busqueda
+	- la lista de resultados mostraran el codigo, el nombre y un boton para ver el recurso 
+	- en la vista del recurso estaran las opciones de edicion y eliminacion del mismo
+	- se podria tener dos opciones principales de busqueda, una con el campo de texto y otra con selects dinamicos
+	- solo se podran modificar y eliminar cuentas que se hubieran creado por los usuarios del sistema, no las nativas
+		- en el caso de tener dependencias en otras cuentas, mostrar un aviso al usuario mencionando que no se puede eliminar o actualizar la cuenta debido a las cuentas dependientes
+	
+	- autenticacion
+		https://laravel.com/docs/5.1/authentication
+	- manejo de roles:
+		- https://laravel.com/docs/5.1/authorization
+		- http://heera.it/laravel-5-1-x-acl-middleware#.V2DuubvhBki
+		https://laracasts.com/discuss/channels/general-discussion/roles-and-permissions-in-laravel-5?page=1
+		https://medium.com/@yamidvo/tutorial-sistema-de-roles-y-permisos-en-laravel-entrust-a69a8efda3e2#.u4lixi8qv
+		http://www.kabytes.com/programacion/roles-y-permisos-para-laravel-5/
+		- https://github.com/Zizaco/entrust/tree/laravel-5
+		- https://github.com/romanbican/roles
+		- https://cartalyst.com/manual/sentinel/2.0#integration
+	- validacion 
+		https://laravel.com/docs/5.1/validation#form-request-validation
+	
+
 - correr el script para crear las tablas: puc_clase, puc_grupo, puc_cuenta, puc_subcuenta, puc_cuentaauxiliar
 	- estas tablas ya contienen los campos created_at, updated_at y deleted_at
 - correr el script para llenar las tablas creadas con la informacion predefinida: Camaleon_data_puc_con_campos.sql
@@ -17,14 +50,14 @@ Laravel proyecto camaleon
 	Route::resource('cuentasauxiliares', 'puc_cuentaauxiliarController');
 	
 - se crean los directorios para los archivos de cada modulo: controllers, requests, models, repositories, views
-	- en el caso de PUC: \Admin\Datos\Puc
+	- en el caso de PUC: \Admin\Puc
 	
 - se crean las url por medio de Route::group para los modulos
 	- todo lo que tenga rutas debe ser modificado, normalmente son las vistas y los controladores unicamente 
 	- las url se estan dejando todas en minusculas y los namespace o directorios con la primera letra en mayuscula
 	- en el caso de PUC: 
-		url: /admin/datos/puc/
-		directorios: \Admin\Datos\Puc\
+		url: /admin/puc/
+		directorios: \Admin\Puc\
 
 - en el Route::group de las rutas, al cambiar de namespace se debe: 
 	- mover el controlador a la carpeta correcta
@@ -39,36 +72,18 @@ Laravel proyecto camaleon
 	- repositories
 	- views
 
-- se modifican las vistas, con el fin de colocar el id correcto para cada tabla:
-	cuentaClases.edit y cuentaClases.table cambiando el valor ->id por ->cntc_id
-	cuentaGrupos.edit y cuentaGrupos.table cambiando el valor ->id por ->cntg_id
-	cuentas.edit y cuentas.table cambiando el valor ->id por ->cnt_id
-	subcuentas.edit y subcuentas.table cambiando el valor ->id por ->scnt_id
-	cuentaAuxiliars.edit y cuentaAuxiliars.table cambiando el valor ->id por ->cntaux_id
-
 - se coloca la paginacion en 5 registros para cada uno de los modelos
 	- se modifican los controladores de cada uno, en el metodo index se cambia el valor ->all(); por ->paginate(5);
-		cuenta_claseController
-		cuenta_grupoController
-		cuentaController
-		subcuentaController
-		cuenta_auxiliarController
+		puc_claseController
+		puc_grupoController
+		puc_cuentaController
+		puc_subcuentaController
+		puc_cuentaauxiliarController
 	- se modifican las vistas index de cada uno, justo debajo de la instruccion @include('[$directorio$].table') colocar la instruccion {!! $[$variable$]->render() !!}
-		cuentaClases.index 
-			@include('cuentaClases.table')
-			{!! $cuentaClases->render() !!}
-		cuentaGrupos.index 
-			@include('cuentaGrupos.table')
-			{!! $cuentaGrupos->render() !!}
-		cuentas.index 
-			@include('cuentas.table')
-			{!! $cuentas->render() !!}
-		subcuentas.index 
-			@include('subcuentas.table')
-			{!! $subcuentas->render() !!}
-		cuentaAuxiliars.index
-			@include('cuentaAuxiliars.table')
-			{!! $cuentaAuxiliars->render() !!}
+		admin.puc.pucClases.index 
+			@include('pucClases.table')
+			{!! $pucClases->render() !!}
+			...
 		
 - se pueden editar los tamaños de los botones 
 	http://www.w3schools.com/bootstrap/bootstrap_ref_css_buttons.asp
@@ -78,8 +93,8 @@ Laravel proyecto camaleon
 	http://www.w3schools.com/icons/fontawesome_icons_form.asp
 	http://www.w3schools.com/bootstrap/bootstrap_badges_labels.asp
 	
-- se modificaron todas las vistas create, edit, index y show con la instruccion @extends('layouts.admin')
-	- esto debido a que se creo un layout con un menu lateral
+- se modificaron todas las vistas create, edit, index y show con la instruccion @extends('layouts.principal')
+	- esto debido a que se obtubo un layout con un menu lateral
 	
 - agregar las restricciones a los campos de acuerdo a la definicion en la base de datos, si es not null, si es FK o PK
 	- tener en cuenta la longitud del campo
@@ -103,36 +118,36 @@ Laravel proyecto camaleon
 		
 - modificar los campos de llaves foraneas por selects
 	//ejemplo	
-	//vista /cuentaGrupos/fields
-	{!! Form::label('cntg_cntcid', 'Cntg Cntcid:') !!}
-	{!! Form::select('cntg_cntcid', $cuentaClase, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una clase' ])!!}
+	//vista /pucGrupos/fields
+	{!! Form::label('codigo', 'Código:') !!}
+	{!! Form::select('codigo', $pucClase, null, ['class' => 'form-control', 'placeholder' => 'Seleccione una clase' ])!!}
 	
 - en el controlador incluir el/los modelo/s de las tablas de referencia de las llaves foraneas
 	//ejemplo
 		
-		use App\Models\cuenta_clase;
+		use App\Models\puc_clase;
 		
 	- modificar el metodo create
 		//ejemplo
-		//se lista el nombre y el id correspondiente a todos las cuenta_clase
-				$cuentaClase = cuenta_clase::lists('nombre', 'cntc_id');
-				return view('cuentaGrupos.create',compact('cuentaClase'));
+		//se lista el nombre y el id correspondiente a todos las puc_clase
+				$pucClase = puc_clase::lists('nombre', 'codigo');
+				return view('pucGrupos.create',compact('pucClase'));
 	
 - se crear la validacion para el momento de actualizar un registro, metodo update()
 	- se debe crear una consulta por el id enviado y luego validar que no exista o que no sea diferente al actual
 		
-		//consulta si existe un registro con el cntg_id enviado
-		$consultaId = $this->cuentaGrupoRepository->findWithoutFail($request->cntg_id);
+		//consulta si existe un registro con el codigo enviado
+		$consultaId = $this->cuentaGrupoRepository->findWithoutFail($request->codigo);
 		
-		//valida que no exista un registro con el mismo cntg_id
-		if( count($consultaId) > 0 && $id !== $request->cntg_id ){
+		//valida que no exista un registro con el mismo codigo
+		if( count($consultaId) > 0 && $id !== $request->codigo ){
 			Flash::error('Ya existe un Grupo con ese Id');
-			//Flash::error($id.' Ya existe un Grupo con ese Id'. count($cuentaGrupo) .' - '.$request->cntg_id .' - '.count($grupoNuevo)  );
+			//Flash::error($id.' Ya existe un Grupo con ese Id'. count($pucGrupo) .' - '.$request->codigo .' - '.count($grupoNuevo)  );
 			//url() .'/'. $request->path() .'/edit'
 			
 			//regresa al formulario de actualizacion del recurso
-            return redirect(route( 'admin.datos.puc.grupos.edit',['id' => $id] ));
-            //return redirect(route( 'admin.datos.puc.grupos.index'));
+            return redirect(route( 'admin.puc.grupos.edit',['id' => $id] ));
+            //return redirect(route( 'admin.puc.grupos.index'));
 		}
 
 	

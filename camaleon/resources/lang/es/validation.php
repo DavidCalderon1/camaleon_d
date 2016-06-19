@@ -145,13 +145,12 @@ return [
         'cnt_id'               	=> 'Id de la cuenta',
         'scnt_id'               => 'Id de la subcuenta',
         'cntaux_id'           	=> 'Id de la cuenta auxiliar',
-		
-        'cntg_cntcid'           => 'Clase Id',
-        'cnt_cntgid'        	=> 'Grupo Id',
-        'scnt_cntid'        	=> 'Cuenta Id',
-        'cntaux_scntid'        	=> 'Subcuenta Id',
-		
-        'scnt_nativa'        	=> 'Nativa',
+				
+        'clase_id'        	=> 'Clase',
+        'grupo_id'        	=> 'Grupo',
+        'cuenta_id'        	=> 'Cuenta',
+        'subcuenta_id'        	=> 'Subcuenta',
+        'tercero_activo'        	=> 'tercero/activo',
 		
     ],
 
