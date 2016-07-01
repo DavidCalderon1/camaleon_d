@@ -4,6 +4,7 @@ namespace App\Models\Admin\Puc;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 /**
  * @SWG\Definition(
@@ -50,7 +51,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class puc_grupo extends Model
 {
-    //use SoftDeletes;
+    use SoftDeletes;
 
     public $table = 'puc_grupo';
     
@@ -67,7 +68,6 @@ class puc_grupo extends Model
         'nombre',
         'descripcion',
         'ajuste',
-        'nativa',
     ];
 
     /**
@@ -81,7 +81,6 @@ class puc_grupo extends Model
         'nombre' => 'string',
         'descripcion' => 'string',
         'ajuste' => 'string',
-        'nativa' => 'boolean',
     ];
 
     /**
@@ -95,6 +94,27 @@ class puc_grupo extends Model
         'nombre' => 'required|max:255',
         'descripcion' => 'required',
         'ajuste' => 'required|max:10',
-        'nativa' => 'required|boolean',
     ];
+
+    // cada grupo tiene una clase
+    public function clases() {
+        return $this->belongsTo('App\Models\Admin\Puc\puc_clase','clase_id','id');
+    }
+
+    // cada grupo tiene muchas cuentas
+    public function cuentas() {
+        return $this->hasMany('App\Models\Admin\Puc\puc_cuenta','grupo_id','id');
+    }
+
+    //recibe los parametros del where
+    //ejemplo ->CodigoNombre('name'.'='.'pepe')
+    public function scopeCodigoNombre($query, $condicion)
+    {
+        //de esta manera se obtienen para llenar los registros con blade
+        //return $query->select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre"), "id")->whereRaw($condicion)->orderBy('id', 'asc')->lists('nombre','id');
+
+        //de esta manera se obtienen como tipo json para llenar los registros con jquery
+        return $query->select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre"), "id")->whereRaw($condicion)->orderBy('id', 'asc')->get();
+    }
+
 }

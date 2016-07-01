@@ -4,6 +4,7 @@ namespace App\Models\Admin\Puc;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 /**
  * @SWG\Definition(
@@ -105,4 +106,17 @@ class puc_cuentaauxiliar extends Model
 		'tercero_activo' => 'required|boolean',
 		'estado' => 'required|boolean',
     ];
+
+    // cada cuenta auxiliar tiene una subcuenta
+    public function subcuentas() {
+        return $this->belongsTo('App\Models\Admin\Puc\puc_subcuenta','subcuenta_id','id');
+    }
+    
+    //recibe los parametros del where
+    //ejemplo ->CodigoNombre('name'.'='.'pepe')
+    public function scopeCodigoNombre($query, $condicion)
+    {
+        //de esta manera se obtienen como tipo json para llenar los registros con jquery
+        return $query->select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre"), "id")->whereRaw($condicion)->orderBy('id', 'asc')->get();
+    }
 }

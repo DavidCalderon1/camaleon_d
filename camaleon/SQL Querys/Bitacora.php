@@ -1,3 +1,8 @@
+Especificar el host y el puerto por el que se quiere iniciar el servidor
+	php artisan serve --host=some.other.domain --port=8001
+Muesra una lista de los puertos que estan activos
+	netstat -p TCP -a -n
+
 Laravel proyecto camaleon
 - requisitos segun los casos de uso
 	- crear, actualizar y eliminar  grupos, cuentas, subcuentas y cuentas auxiliares
@@ -204,3 +209,66 @@ Laravel proyecto camaleon
 			update puc_cuenta set created_at = '0001-01-01 01:01:01';
 			update puc_subcuenta set created_at = '0001-01-01 01:01:01';
 			update puc_cuentaauxiliar set created_at = '0001-01-01 01:01:01';
+			
+			
+- se creo un archivo en la carpeta /config llamado 'options' y en el se creo un array con el nombre 'types_puc' y se ingresaron los tipos de puc para volcarlos en los select con el parametro config('options.puc_types'),
+			
+- se modifican las vistas para que sean utiles para todas las cuentas puc
+- configurar las relaciones hasmany ... para las vistas de cada registro
+    //modelo puc_clase
+    // cada clase tiene muchos grupos
+    public function grupos() {
+        return $this->hasMany('App\Models\Admin\Puc\puc_grupo','clase_id','id');
+    }
+    
+    //modelo puc_grupo
+	// cada grupo tiene una clase
+    public function clases() {
+		//return $this->belongsTo('model_target','foreign_key','relation');
+        return $this->belongsTo('App\Models\Admin\Puc\puc_clase','clase_id','id');
+    }
+	
+- concatenar columnas para volcar en un select
+	use DB;
+	...
+	//se lista el nombre y el id correspondiente a todos los puc_cuenta
+    $this->listCuentas =  puc_cuenta::select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre"), "id")->orderBy('id', 'asc')->lists('nombre','id');
+		
+- se agrego una funcion en el repositorio de cada cuenta para ingresar los parametros de busqueda
+	public function busqueda($busqueda)
+    {
+        return $this->model->where('codigo', 'like', '%'.strtoupper($busqueda).'%')->orWhere('nombre', 'like', '%'.strtoupper($busqueda).'%');
+        
+    }
+	
+	
+- modificar la configuracion de postgresql para poder ver un log de las consultas realizadas
+		Edit your /etc/postgresql/9.3/main/postgresql.conf, and change the lines as follows.
+
+		Note: If you didn't find the postgresql.conf file, then just type $locate postgresql.conf in a terminal
+
+		#log_destination = 'syslog' to log_directory = 'pg_log'
+		
+		
+		
+		#log_directory = 'pg_log' to log_directory = 'pg_log'
+		#log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log' to log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'
+		#log_statement = 'none' to log_statement = 'all'
+		#logging_collector = off to logging_collector = on
+		Optional: SELECT set_config('log_statement', 'all', true);
+		sudo /etc/init.d/postgresql restart or sudo service postgresql restart
+		Fire query in postgresql select 2+2
+		Find current log in /var/lib/pgsql/9.2/data/pg_log/
+		
+		
+
+- SOLUCIONADO: hace falta configurar la paginacion		
+- hace falta configurar el cache o devolver los datos al formulario
+- SOLUCIONADO: hace falta configurar el modal para los select
+- SOLUCIONADO: hace falta configurar la pantalla de 'Cargando...' para todos los botones o links que lo ameriten: ver, editar, guardar, buscar, eliminar ...
+	- se puede hacer con un modal
+	- se hizo para que se muestre en toda la pantalla al ejecutar una peticion ajax
+- SOLUCIONADO: hace falta unificar los script, determinar los parametros comunes y en lo posible dejar solo uno para todas las peticiones ajax
+- SOLUCIONADO: hace falta configurar botones y motrar las respuestas para todas las peticiones ajax
+- SOLUCIONADO: hace falta configurar el funcionamientos de todos los modelos, como el de puc_grupos
+

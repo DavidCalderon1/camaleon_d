@@ -146,6 +146,7 @@ return [
         'scnt_id'               => 'Id de la subcuenta',
         'cntaux_id'           	=> 'Id de la cuenta auxiliar',
 				
+        'codigo'          => 'Código',
         'clase_id'        	=> 'Clase',
         'grupo_id'        	=> 'Grupo',
         'cuenta_id'        	=> 'Cuenta',

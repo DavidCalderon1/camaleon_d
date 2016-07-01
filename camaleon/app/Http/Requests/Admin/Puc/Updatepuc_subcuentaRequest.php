@@ -31,7 +31,6 @@ class Updatepuc_subcuentaRequest extends Request
 			'nombre' => 'required|max:255',
 			'descripcion' => 'required',
 			'ajuste' => 'required|max:10',
-			'nativa' => 'required|boolean',
 		];
     }
 }

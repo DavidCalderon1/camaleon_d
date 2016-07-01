@@ -10,19 +10,40 @@ use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
-use App\Models\Admin\Puc\puc_cuenta;
+use DB;
+use App\Models\Admin\Puc\puc_clase;
+// esta libreria va a dar la facilidad de obtener parametros que se encuentran en nuestra ruta
+use Illuminate\Routing\Route;
 
 class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
 {
     /** @var  puc_subcuentaRepository */
     private $pucSubcuentaRepository;
-	private $pucCuenta;
+    private $listClases;
+    private $pucCuenta;
+    private $peticion;
 
-    public function __construct(puc_subcuentaRepository $pucSubcuentaRepo)
+    public function __construct(puc_subcuentaRepository $pucSubcuentaRepo, Request $request)
     {
         $this->pucSubcuentaRepository = $pucSubcuentaRepo;
-		//se lista el nombre y el id correspondiente a todos los puc_cuenta
-		$this->pucCuenta =  puc_cuenta::orderBy('id')->lists('nombre', 'id');
+        //filtro que se ejecutara antes de cualquier accion del controlador, se especifica el metodo en el que se desea ejecutar
+        $this->beforeFilter('@find',['only' => ['edit','show','update','destroy'] ]);
+        $this->beforeFilter('@selection',['only' => ['create','edit'] ]);
+        $this->peticion = "normal";
+        //va a mostrar la vista 'tables' en el caso de ser una peticion de tipo ajax
+        if ($request->ajax() || $request->peticion == "ajax") {
+            $this->peticion = "ajax";
+        }
+    }
+    //metodo find ejecutado por el metodo beforeFilter dentro del constructor
+    public function find(Route $route){
+        //va a buscar los parametros que estan el esta ruta y que son enviados por el recurso, que en este caso es 'subcuentas' el configurado en las rutas
+        $this->pucCuenta = $this->pucSubcuentaRepository->findWithoutFail( $route->getParameter('subcuentas') );
+    }
+    //metodo selection ejecutado por el metodo beforeFilter dentro del constructor
+    public function selection(){
+        //se lista el nombre y el id correspondiente a todos los puc_cuenta
+        $this->listClases =  puc_clase::select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre, id"))->orderBy('id', 'asc')->lists('nombre','id');
     }
 
     /**
@@ -34,10 +55,19 @@ class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
     public function index(Request $request)
     {
         $this->pucSubcuentaRepository->pushCriteria(new RequestCriteria($request));
-        $pucSubcuentas = $this->pucSubcuentaRepository->orderBy('codigo', 'asc')->paginate(15);
-
-        return view('Admin.Puc.pucSubcuentas.index')
-            ->with('pucSubcuentas', $pucSubcuentas);
+        $pucCuentas = $this->pucSubcuentaRepository;
+        $vista = "admin.puc.pucCuentas.index";
+        //si hay un request con el nombre busqueda se envia el parametro para realizar la busqueda
+        if ( isset($request->busqueda) ) {
+            $pucCuentas = $pucCuentas->busqueda($request->busqueda);
+        }
+        //si hay un request con el nombre listaid se envia el parametro para realizar la busqueda de todos los registros que tengan la llave foranea con ese valor
+        if ( isset($request->listaid) ) {
+            $pucCuentas = $pucCuentas->listaid($request->listaid);
+        }
+        
+        $pucCuentas = $pucCuentas->orderBy('codigo', 'asc')->paginate(15);
+        return view($vista, ['peticion' => $this->peticion, 'ruta' => 'subcuentas', 'nombre' => 'subcuenta', 'pucCuentas' => $pucCuentas]);
     }
 
     /**
@@ -47,7 +77,7 @@ class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function create()
     {
-        return view('Admin.Puc.pucSubcuentas.create')->with('pucCuenta', $this->pucCuenta);
+        return view('admin.puc.pucCuentas.create', ['peticion' => $this->peticion, 'ruta' => 'subcuentas', 'nombre' => 'subcuenta', 'listClases' => $this->listClases]);
     }
 
     /**
@@ -61,11 +91,11 @@ class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
     {
         $input = $request->all();
 
-        $pucSubcuenta = $this->pucSubcuentaRepository->create($input);
+        $this->pucCuenta = $this->pucSubcuentaRepository->create($input);
 
         Flash::success('Subcuenta guardada correctamente.');
 
-	return redirect(route('admin.puc.subcuentas.show',$pucSubcuenta->id) );
+        return redirect(route('admin.puc.subcuentas.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -77,15 +107,13 @@ class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function show($id)
     {
-        $pucSubcuenta = $this->pucSubcuentaRepository->findWithoutFail($id);
-
-        if (empty($pucSubcuenta)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Subcuenta no encontrada');
 
             return redirect(route('admin.puc.subcuentas.index'));
         }
 
-        return view('Admin.Puc.pucSubcuentas.show')->with('pucSubcuenta', $pucSubcuenta);
+        return view('admin.puc.pucCuentas.show', ['peticion' => $this->peticion, 'ruta' => 'subcuentas', 'nombre' => 'subcuenta', 'pucCuenta' => $this->pucCuenta]);
     }
 
     /**
@@ -97,16 +125,14 @@ class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function edit($id)
     {
-        $pucSubcuenta = $this->pucSubcuentaRepository->findWithoutFail($id);
-
-        if (empty($pucSubcuenta)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Subcuenta no encontrada');
 
             return redirect(route('admin.puc.subcuentas.index'));
         }
 
-        return view('Admin.Puc.pucSubcuentas.edit', ['pucSubcuenta' => $pucSubcuenta, 'pucCuenta' => $this->pucCuenta]);
-	
+        return view('admin.puc.pucCuentas.edit', ['peticion' => $this->peticion, 'ruta' => 'subcuentas', 'nombre' => 'subcuenta', 'pucCuenta' => $this->pucCuenta, 'listClases' => $this->listClases]);
+    
     }
 
     /**
@@ -119,27 +145,26 @@ class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function update($id, Updatepuc_subcuentaRequest $request)
     {
-        $pucSubcuenta = $this->pucSubcuentaRepository->findWithoutFail($id);
-	//consulta si existe un registro con el codigo enviado
+        //consulta si existe un registro con el codigo enviado
         $consultaId = $this->pucSubcuentaRepository->findWithoutFail($request->codigo);
 
-        if (empty($pucSubcuenta)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Subcuenta no encontrada');
 
             return redirect(route('admin.puc.subcuentas.index'));
         }
-		//valida que no exista un registro con el mismo codigo
-		if( count($consultaId) > 0 && $pucSubcuenta->codigo  !== $request->codigo ){
-			Flash::error('Ya existe una Subcuenta con ese código');
-			//regresa al formulario de actualizacion del recurso
-			return redirect(route( 'admin.puc.subcuentas.edit',['id' => $id] ));
-		}
+        //valida que no exista un registro con el mismo codigo
+        if( count($consultaId) > 0 && $this->pucCuenta->codigo  !== $request->codigo ){
+            Flash::error('Ya existe una Subcuenta con ese código');
+            //regresa al formulario de actualizacion del recurso
+            return redirect(route( 'admin.puc.subcuentas.edit',['id' => $id] ));
+        }
 
-        $pucSubcuenta = $this->pucSubcuentaRepository->update($request->all(), $id);
+        $this->pucCuenta = $this->pucSubcuentaRepository->update($request->all(), $id);
 
         Flash::success('Subcuenta actualizada correctamente.');
 
-        return redirect(route('admin.puc.subcuentas.show',$pucSubcuenta->id) );
+        return redirect(route('admin.puc.subcuentas.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion]) );
     }
 
     /**
@@ -151,9 +176,7 @@ class puc_subcuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function destroy($id)
     {
-        $pucSubcuenta = $this->pucSubcuentaRepository->findWithoutFail($id);
-
-        if (empty($pucSubcuenta)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Subcuenta no encontrada');
 
             return redirect(route('admin.puc.subcuentas.index'));

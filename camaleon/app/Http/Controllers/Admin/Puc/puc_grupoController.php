@@ -10,19 +10,41 @@ use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use DB;
 use App\Models\Admin\Puc\puc_clase;
+// esta libreria va a dar la facilidad de obtener parametros que se encuentran en nuestra ruta
+use Illuminate\Routing\Route;
 
 class puc_grupoController extends \App\Http\Controllers\AppBaseController
 {
     /** @var  puc_grupoRepository */
     private $pucGrupoRepository;
-    private $pucClase;
+    private $listClases;
+    private $pucCuenta;
+    private $peticion;
 
-    public function __construct(puc_grupoRepository $pucGrupoRepo)
+    public function __construct(puc_grupoRepository $pucGrupoRepo, Request $request)
     {
         $this->pucGrupoRepository = $pucGrupoRepo;
+        //filtro que se ejecutara antes de cualquier accion del controlador, se especifica el metodo en el que se desea ejecutar
+        $this->beforeFilter('@find',['only' => ['edit','show','update','destroy'] ]);
+        $this->beforeFilter('@selection',['only' => ['create','edit'] ]);
+        
+        $this->peticion = "normal";
+        //va a mostrar la vista 'tables' en el caso de ser una peticion de tipo ajax
+        if ($request->ajax() || $request->peticion == "ajax") {
+            $this->peticion = "ajax";
+        }
+    }
+    //metodo find ejecutado por el metodo beforeFilter dentro del constructor
+    public function find(Route $route){
+        //va a buscar los parametros que estan el esta ruta y que son enviados por el recurso, que en este caso es 'grupos' el configurado en las rutas
+        $this->pucCuenta = $this->pucGrupoRepository->findWithoutFail( $route->getParameter('grupos') );
+    }
+    //metodo selection ejecutado por el metodo beforeFilter dentro del constructor
+    public function selection(){
         //se lista el nombre y el id correspondiente a todas las puc_clase
-		$this->pucClase =  puc_clase::lists('nombre', 'id');
+        $this->listClases =  puc_clase::select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre, id"))->orderBy('id', 'asc')->lists('nombre','id');
     }
 
     /**
@@ -34,10 +56,19 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
     public function index(Request $request)
     {
         $this->pucGrupoRepository->pushCriteria(new RequestCriteria($request));
-        $pucGrupos = $this->pucGrupoRepository->orderBy('codigo', 'asc')->paginate(15);
+        $pucCuentas = $this->pucGrupoRepository;
+        $vista = "admin.puc.pucCuentas.index";
+        //si hay un request con el nombre busqueda se envia el parametro para realizar la busqueda
+        if ( isset($request->busqueda) ) {
+            $pucCuentas = $pucCuentas->busqueda($request->busqueda);
+        }
+        //si hay un request con el nombre listaid se envia el parametro para realizar la busqueda de todos los registros que tengan la llave foranea con ese valor
+        if ( isset($request->listaid) ) {
+            $pucCuentas = $pucCuentas->listaid($request->listaid);
+        }
 
-        return view('admin.puc.pucGrupos.index')
-            ->with('pucGrupos', $pucGrupos);
+        $pucCuentas = $pucCuentas->orderBy('codigo', 'asc')->paginate(15);
+        return view($vista, ['peticion' => $this->peticion, 'ruta' => 'grupos', 'nombre' => 'grupo', 'pucCuentas' => $pucCuentas]);
     }
 
     /**
@@ -47,7 +78,7 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
      */
     public function create()
     {
-        return view('admin.puc.pucGrupos.create')->with('pucClase', $this->pucClase);
+        return view('admin.puc.pucCuentas.create', ['peticion' => $this->peticion, 'ruta' => 'grupos', 'nombre' => 'grupo', 'listClases' => $this->listClases]);
     }
 
     /**
@@ -61,12 +92,11 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
     {
         $input = $request->all();
 
-        $pucGrupo = $this->pucGrupoRepository->create($input);
-
+        $this->pucCuenta = $this->pucGrupoRepository->create($input);
+        
         Flash::success('Grupo guardado correctamente.');
 
-        //return redirect(route('admin.puc.grupos.index'));
-		return redirect(route('admin.puc.grupos.show',$pucGrupo->id) );
+		return redirect(route('admin.puc.grupos.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -78,15 +108,13 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
      */
     public function show($id)
     {
-        $pucGrupo = $this->pucGrupoRepository->findWithoutFail($id);
-
-        if (empty($pucGrupo)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Grupo no encontrado');
 
             return redirect(route('admin.puc.grupos.index'));
         }
 
-        return view('admin.puc.pucGrupos.show')->with('pucGrupo', $pucGrupo);
+        return view('admin.puc.pucCuentas.show', ['peticion' => $this->peticion, 'ruta' => 'grupos', 'nombre' => 'grupo', 'pucCuenta' => $this->pucCuenta] );
     }
 
     /**
@@ -98,15 +126,13 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
      */
     public function edit($id)
     {
-        $pucGrupo = $this->pucGrupoRepository->findWithoutFail($id);
-
-        if (empty($pucGrupo)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Grupo no encontrado');
 
             return redirect(route('admin.puc.grupos.index'));
         }
 
-        return view('admin.puc.pucGrupos.edit',['pucGrupo' => $pucGrupo, 'pucClase' => $this->pucClase]);
+        return view('admin.puc.pucCuentas.edit', ['peticion' => $this->peticion, 'ruta' => 'grupos', 'nombre' => 'grupo', 'pucCuenta' => $this->pucCuenta, 'listClases' => $this->listClases]);
     }
 
     /**
@@ -119,16 +145,15 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
      */
     public function update($id, Updatepuc_grupoRequest $request)
     {
-        $pucGrupo = $this->pucGrupoRepository->findWithoutFail($id);
 		//consulta si existe un registro con el codigo enviado
 		$consultaId = $this->pucGrupoRepository->findWithoutFail($request->codigo);
 
-        if (empty($pucGrupo)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Grupo no encontrado');
             return redirect(route('admin.puc.grupos.index'));
         }
 		//valida que no exista un registro con el mismo codigo
-		if( count($consultaId) > 0 && $pucGrupo->codigo !== $request->codigo ){
+		if( count($consultaId) > 0 && $this->pucCuenta->codigo !== $request->codigo ){
 			Flash::error('Ya existe un Grupo con ese Código');
 				
 			//regresa al formulario de actualizacion del recurso
@@ -136,12 +161,12 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
 				
 		}
 
-        $pucGrupo = $this->pucGrupoRepository->update($request->all(), $id);
+        $this->pucCuenta = $this->pucGrupoRepository->update($request->all(), $id);
 
         Flash::success('Grupo actualizado correctamente.');
 
         //return redirect(route('admin.puc.grupos.index'));
-		return redirect(route('admin.puc.grupos.show',$pucGrupo->id) );
+		return redirect(route('admin.puc.grupos.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ] ) );
     }
 
     /**
@@ -153,9 +178,7 @@ class puc_grupoController extends \App\Http\Controllers\AppBaseController
      */
     public function destroy($id)
     {
-        $pucGrupo = $this->pucGrupoRepository->findWithoutFail($id);
-
-        if (empty($pucGrupo)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Grupo no encontrado');
 
             return redirect(route('admin.puc.grupos.index'));

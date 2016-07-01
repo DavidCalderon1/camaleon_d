@@ -10,19 +10,40 @@ use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
-use App\Models\Admin\Puc\puc_subcuenta;
+use DB;
+use App\Models\Admin\Puc\puc_clase;
+// esta libreria va a dar la facilidad de obtener parametros que se encuentran en nuestra ruta
+use Illuminate\Routing\Route;
 
 class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseController
 {
     /** @var  puc_cuentaauxiliarRepository */
     private $pucCuentaauxiliarRepository;
-	private $pucSubcuenta;
+    private $listClases;
+    private $pucCuenta;
+    private $peticion;
 
-    public function __construct(puc_cuentaauxiliarRepository $pucCuentaauxiliarRepo)
+    public function __construct(puc_cuentaauxiliarRepository $pucCuentaauxiliarRepo, Request $request)
     {
         $this->pucCuentaauxiliarRepository = $pucCuentaauxiliarRepo;
-		//se lista el nombre y el id correspondiente a todos los puc_grupo
-		$this->pucSubcuenta =  puc_subcuenta::orderBy('id')->lists('nombre', 'id');
+        //filtro que se ejecutara antes de cualquier accion del controlador, se especifica el metodo en el que se desea ejecutar
+        $this->beforeFilter('@find',['only' => ['edit','show','update','destroy'] ]);
+        $this->beforeFilter('@selection',['only' => ['create','edit'] ]);
+        $this->peticion = "normal";
+        //va a mostrar la vista 'tables' en el caso de ser una peticion de tipo ajax
+        if ($request->ajax() || $request->peticion == "ajax") {
+            $this->peticion = "ajax";
+        }
+    }
+    //metodo find ejecutado por el metodo beforeFilter dentro del constructor
+    public function find(Route $route){
+        //va a buscar los parametros que estan el esta ruta y que son enviados por el recurso, que en este caso es 'cuentasauxiliares' el configurado en las rutas
+        $this->pucCuenta = $this->pucCuentaauxiliarRepository->findWithoutFail( $route->getParameter('cuentasauxiliares') );
+    }
+    //metodo selection ejecutado por el metodo beforeFilter dentro del constructor
+    public function selection(){
+        //se lista el nombre y el id correspondiente a todas las puc_subcuenta
+        $this->listClases =  puc_clase::select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre, id"))->orderBy('id', 'asc')->lists('nombre','id');
     }
 
     /**
@@ -34,10 +55,19 @@ class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseControll
     public function index(Request $request)
     {
         $this->pucCuentaauxiliarRepository->pushCriteria(new RequestCriteria($request));
-        $pucCuentaauxiliars = $this->pucCuentaauxiliarRepository->orderBy('codigo', 'asc')->paginate(15);
+        $pucCuentas = $this->pucCuentaauxiliarRepository;
+        $vista = "admin.puc.pucCuentas.index";
+        //si hay un request con el nombre busqueda se envia el parametro para realizar la busqueda
+        if ( isset($request->busqueda) ) {
+            $pucCuentas = $pucCuentas->busqueda($request->busqueda);
+        }
+        //si hay un request con el nombre listaid se envia el parametro para realizar la busqueda de todos los registros que tengan la llave foranea con ese valor
+        if ( isset($request->listaid) ) {
+            $pucCuentas = $pucCuentas->listaid($request->listaid);
+        }
 
-        return view('admin.puc.pucCuentaauxiliars.index')
-            ->with('pucCuentaauxiliars', $pucCuentaauxiliars);
+        $pucCuentas = $pucCuentas->orderBy('codigo', 'asc')->paginate(15);
+        return view($vista, ['peticion' => $this->peticion, 'ruta' => 'cuentasauxiliares', 'nombre' => 'cuentas auxiliares', 'pucCuentas' => $pucCuentas]);
     }
 
     /**
@@ -47,7 +77,7 @@ class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseControll
      */
     public function create()
     {
-        return view('admin.puc.pucCuentaauxiliars.create')->with('pucSubcuenta', $this->pucSubcuenta);
+        return view('admin.puc.pucCuentas.create', ['peticion' => $this->peticion, 'ruta' => 'cuentasauxiliares', 'nombre' => 'cuentas auxiliares', 'listClases' => $this->listClases]);
     }
 
     /**
@@ -61,11 +91,11 @@ class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseControll
     {
         $input = $request->all();
 
-        $pucCuentaauxiliar = $this->pucCuentaauxiliarRepository->create($input);
+        $this->pucCuenta = $this->pucCuentaauxiliarRepository->create($input);
 
         Flash::success('Cuenta Auxiliar guardada correctamente.');
 
-        return redirect(route('admin.puc.cuentasauxiliares.show',$pucCuentaauxiliar->id) );
+        return redirect(route('admin.puc.cuentasauxiliares.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -77,15 +107,13 @@ class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseControll
      */
     public function show($id)
     {
-        $pucCuentaauxiliar = $this->pucCuentaauxiliarRepository->findWithoutFail($id);
-
-        if (empty($pucCuentaauxiliar)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta Auxiliar no encontrada');
 
             return redirect(route('admin.puc.cuentasauxiliares.index'));
         }
 
-        return view('admin.puc.pucCuentaauxiliars.show')->with('pucCuentaauxiliar', $pucCuentaauxiliar);
+        return view('admin.puc.pucCuentas.show', ['peticion' => $this->peticion, 'ruta' => 'cuentasauxiliares', 'nombre' => 'cuentas auxiliares', 'pucCuenta' => $this->pucCuenta]);
     }
 
     /**
@@ -97,16 +125,14 @@ class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseControll
      */
     public function edit($id)
     {
-        $pucCuentaauxiliar = $this->pucCuentaauxiliarRepository->findWithoutFail($id);
-
-        if (empty($pucCuentaauxiliar)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta Auxiliar no encontrada');
 
             return redirect(route('admin.puc.cuentasauxiliares.index'));
         }
 
-        return view('admin.puc.pucCuentaauxiliars.edit', ['pucCuentaauxiliar' => $pucCuentaauxiliar, 'pucSubcuenta' => $this->pucSubcuenta]);
-	
+        return view('admin.puc.pucCuentas.edit', ['peticion' => $this->peticion, 'ruta' => 'cuentasauxiliares', 'nombre' => 'cuentas auxiliares', 'pucCuenta' => $this->pucCuenta, 'listClases' => $this->listClases]);
+    
     }
 
     /**
@@ -119,29 +145,28 @@ class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseControll
      */
     public function update($id, Updatepuc_cuentaauxiliarRequest $request)
     {
-        $pucCuentaauxiliar = $this->pucCuentaauxiliarRepository->findWithoutFail($id);
-		//consulta si existe un registro con el codigo enviado
-		$consultaId = $this->pucCuentaauxiliarRepository->findWithoutFail($request->codigo);
+        //consulta si existe un registro con el codigo enviado
+        $consultaId = $this->pucCuentaauxiliarRepository->findWithoutFail($request->codigo);
 
-        if (empty($pucCuentaauxiliar)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta Auxiliar no encontrada');
 
             return redirect(route('admin.puc.cuentasauxiliares.index'));
         }
-		//valida que no exista un registro con el mismo codigo
-		if( count($consultaId) > 0 && $pucCuentaauxiliar->codigo !== $request->codigo ){
-			Flash::error('Ya existe una Cuenta auxiliar con ese Código');
-				
-			//regresa al formulario de actualizacion del recurso
-			return redirect(route( 'admin.puc.cuentasauxiliares.edit',['id' => $id] ));
-				
-		}
+        //valida que no exista un registro con el mismo codigo
+        if( count($consultaId) > 0 && $this->pucCuenta->codigo !== $request->codigo ){
+            Flash::error('Ya existe una Cuenta auxiliar con ese Código');
+                
+            //regresa al formulario de actualizacion del recurso
+            return redirect(route( 'admin.puc.cuentasauxiliares.edit',['id' => $id] ));
+                
+        }
 
-        $pucCuentaauxiliar = $this->pucCuentaauxiliarRepository->update($request->all(), $id);
+        $this->pucCuenta = $this->pucCuentaauxiliarRepository->update($request->all(), $id);
 
         Flash::success('Cuenta Auxiliar actualizada correctamente.');
 
-        return redirect(route('admin.puc.cuentasauxiliares.show',$pucCuentaauxiliar->id) );
+        return redirect(route('admin.puc.cuentasauxiliares.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -153,9 +178,7 @@ class puc_cuentaauxiliarController extends \App\Http\Controllers\AppBaseControll
      */
     public function destroy($id)
     {
-        $pucCuentaauxiliar = $this->pucCuentaauxiliarRepository->findWithoutFail($id);
-
-        if (empty($pucCuentaauxiliar)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta Auxiliar no encontrada');
 
             return redirect(route('admin.puc.cuentasauxiliares.index'));

@@ -4,6 +4,7 @@ namespace App\Models\Admin\Puc;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 /**
  * @SWG\Definition(
@@ -67,7 +68,6 @@ class puc_subcuenta extends Model
         'nombre',
         'descripcion',
         'ajuste',
-        'nativa',
     ];
 
     /**
@@ -81,7 +81,6 @@ class puc_subcuenta extends Model
         'nombre' => 'string',
         'descripcion' => 'string',
         'ajuste' => 'string',
-        'nativa' => 'boolean',
     ];
 
     /**
@@ -95,6 +94,23 @@ class puc_subcuenta extends Model
 		'nombre' => 'required|max:255',
 		'descripcion' => 'required',
 		'ajuste' => 'required|max:10',
-		'nativa' => 'required|boolean',
     ];
+
+    // cada subcuenta tiene una cuenta
+    public function cuentas() {
+        return $this->belongsTo('App\Models\Admin\Puc\puc_cuenta','cuenta_id','id');
+    }
+
+    // cada subcuenta tiene muchas cuentas auxiliares
+    public function cuentasauxiliares() {
+        return $this->hasMany('App\Models\Admin\Puc\puc_cuentaauxiliar','subcuenta_id','id');
+    }
+    
+    //recibe los parametros del where
+    //ejemplo ->CodigoNombre('name'.'='.'pepe')
+    public function scopeCodigoNombre($query, $condicion)
+    {
+        //de esta manera se obtienen como tipo json para llenar los registros con jquery
+        return $query->select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre"), "id")->whereRaw($condicion)->orderBy('id', 'asc')->get();
+    }
 }

@@ -49,6 +49,11 @@ Route::group(['prefix' => '/admin', 'namespace' => 'Admin'], function() {
 			return view('layouts.default', ['site' => 'Plan Único de Cuentas']);
 		});
 		// /admin/puc/
+		//admin.puc.buscar 
+		Route::resource('operacion', 'puc_operacionesController');
+		Route::get('buscar', 'puc_operacionesController@index');
+		Route::get('crear', 'puc_operacionesController@create');
+		Route::get('listas', 'puc_operacionesController@lista');
 		//admin.puc.clases 
 		Route::resource('clases', 'puc_claseController');
 		//admin.puc.grupos 

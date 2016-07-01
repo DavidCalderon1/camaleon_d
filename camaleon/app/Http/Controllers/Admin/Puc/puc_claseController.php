@@ -10,15 +10,31 @@ use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+// esta libreria va a dar la facilidad de obtener parametros que se encuentran en nuestra ruta
+use Illuminate\Routing\Route;
 
 class puc_claseController extends \App\Http\Controllers\AppBaseController
 {
     /** @var  puc_claseRepository */
     private $pucClaseRepository;
+    private $pucCuenta;
+    private $peticion;
 
-    public function __construct(puc_claseRepository $pucClaseRepo)
+    public function __construct(puc_claseRepository $pucClaseRepo, Request $request)
     {
         $this->pucClaseRepository = $pucClaseRepo;
+        //filtro que se ejecutara antes de cualquier accion del controlador, se especifica el metodo en el que se desea ejecutar
+        $this->beforeFilter('@find',['only' => ['edit','show','update','destroy'] ]);
+        $this->peticion = "normal";
+        //va a mostrar la vista 'tables' en el caso de ser una peticion de tipo ajax
+        if ($request->ajax() || $request->peticion == "ajax") {
+            $this->peticion = "ajax";
+        }
+    }
+    //metodo find ejecutado por el metodo beforeFilter dentro del constructor
+    public function find(Route $route){
+        //va a buscar los parametros que estan el esta ruta y que son enviados por el recurso, que en este caso es 'clases' el configurado en las rutas
+        $this->pucCuenta = $this->pucClaseRepository->findWithoutFail( $route->getParameter('clases') );
     }
 
     /**
@@ -30,10 +46,28 @@ class puc_claseController extends \App\Http\Controllers\AppBaseController
     public function index(Request $request)
     {
         $this->pucClaseRepository->pushCriteria(new RequestCriteria($request));
-        $pucClases = $this->pucClaseRepository->orderBy('codigo', 'asc')->paginate(15);
+        $pucCuentas = $this->pucClaseRepository;
+        $vista = "admin.puc.pucCuentas.index";
+        
+        //si hay un request con el nombre busqueda se envia el parametro para realizar la busqueda
+        if ( isset($request->busqueda) ) {
+            $pucCuentas = $pucCuentas->busqueda($request->busqueda);
+            
+            /*
+            //de esta manera se puede crear un query con scopes en el modelo
+            $pucCuentas = $this->pucClaseRepository->scopeQuery(function($query){
+                return $query->orderBy('codigo','asc');
+            })->busqueda($request->busqueda)->paginate(15);
+            */
+        }
+        //si hay un request con el nombre listaid se envia el parametro para realizar la busqueda de todos los registros que tengan la llave foranea con ese valor
+        if ( isset($request->listaid) ) {
+            $pucCuentas = $pucCuentas->listaid($request->listaid);
+        }
 
-        return view('Admin.Puc.pucClases.index')
-            ->with('pucClases', $pucClases);
+        $pucCuentas = $pucCuentas->orderBy('codigo', 'asc')->paginate(15);
+
+        return view($vista, ['peticion' => $this->peticion, 'ruta' => 'clases', 'nombre' => 'clase', 'pucCuentas' => $pucCuentas]);
     }
 
     /**
@@ -43,7 +77,7 @@ class puc_claseController extends \App\Http\Controllers\AppBaseController
      */
     public function create()
     {
-        return view('Admin.Puc.pucClases.create');
+        return view('admin.puc.pucCuentas.create', ['peticion' => $this->peticion, 'ruta' => 'clases', 'nombre' => 'clase']);
     }
 
     /**
@@ -57,12 +91,11 @@ class puc_claseController extends \App\Http\Controllers\AppBaseController
     {
         $input = $request->all();
 
-        $pucClase = $this->pucClaseRepository->create($input);
+        $this->pucCuenta = $this->pucClaseRepository->create($input);
 
         Flash::success('Clase guardada correctamente.');
 
-        //return redirect(route('admin.puc.clases.index'));
-		return redirect(route('admin.puc.clases.show',$pucClase->id) );
+        return redirect(route('admin.puc.clases.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -74,15 +107,13 @@ class puc_claseController extends \App\Http\Controllers\AppBaseController
      */
     public function show($id)
     {
-        $pucClase = $this->pucClaseRepository->findWithoutFail($id);
-
-        if (empty($pucClase)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Clase no encontrada');
 
             return redirect(route('admin.puc.clases.index'));
         }
-
-        return view('Admin.Puc.pucClases.show')->with('pucClase', $pucClase);
+        
+        return view('admin.puc.pucCuentas.show', ['peticion' => $this->peticion, 'ruta' => 'clases', 'nombre' => 'clase', 'pucCuenta' => $this->pucCuenta]);
     }
 
     /**
@@ -94,15 +125,13 @@ class puc_claseController extends \App\Http\Controllers\AppBaseController
      */
     public function edit($id)
     {
-        $pucClase = $this->pucClaseRepository->findWithoutFail($id);
-
-        if (empty($pucClase)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Clase no encontrada');
 
-            return redirect(route('admin.puc.clases.index'));
+            return redirect(route('admin.puc.cuentas.index'));
         }
 
-        return view('Admin.Puc.pucClases.edit')->with('pucClase', $pucClase);
+        return view('admin.puc.pucCuentas.edit', ['peticion' => $this->peticion, 'ruta' => 'clases', 'nombre' => 'clase', 'pucCuenta' => $this->pucCuenta]);
     }
 
     /**
@@ -115,28 +144,27 @@ class puc_claseController extends \App\Http\Controllers\AppBaseController
      */
     public function update($id, Updatepuc_claseRequest $request)
     {
-        $pucClase = $this->pucClaseRepository->findWithoutFail($id);
-	//consulta si existe un registro con el codigo enviado
+        //consulta si existe un registro con el codigo enviado
         $consultaId = $this->pucClaseRepository->findWithoutFail($request->codigo);
 
-        if (empty($pucClase)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Clase no encontrada');
 
             return redirect(route('admin.puc.clases.index'));
         }
-		//valida que no exista un registro con el mismo codigo
-		if( count($consultaId) > 0 && $id !== $request->codigo ){
-			Flash::error('Ya existe una Clase con ese código');
-			//regresa al formulario de actualizacion del recurso
-			return redirect(route( 'admin.puc.clases.edit',['id' => $id] ));
-		}
+        //valida que no exista un registro con el mismo codigo
+        if( count($consultaId) > 0 && $this->pucCuenta->codigo !== $request->codigo ){
+            Flash::error('Ya existe una Clase con ese Código');
+            //regresa al formulario de actualizacion del recurso
+            return redirect(route( 'admin.puc.clases.edit',['id' => $id] ));
+        }
 
-        $pucClase = $this->pucClaseRepository->update($request->all(), $id);
+        $this->pucCuenta = $this->pucClaseRepository->update($request->all(), $id);
 
         Flash::success('Clase actualizada correctamente.');
 
         //return redirect(route('admin.puc.clases.index'));
-		return redirect(route('admin.puc.clases.show',$pucClase->id) );
+        return redirect(route('admin.puc.clases.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -148,9 +176,7 @@ class puc_claseController extends \App\Http\Controllers\AppBaseController
      */
     public function destroy($id)
     {
-        $pucClase = $this->pucClaseRepository->findWithoutFail($id);
-
-        if (empty($pucClase)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Clase no encontrada');
 
             return redirect(route('admin.puc.clases.index'));

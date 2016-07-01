@@ -4,6 +4,7 @@ namespace App\Models\Admin\Puc;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 /**
  * @SWG\Definition(
@@ -88,4 +89,28 @@ class puc_clase extends Model
         'ajuste' => 'required|max:10',
         'naturaleza' => 'required|max:10',
     ];
+
+    // cada clase tiene muchos grupos
+    public function grupos() {
+        return $this->hasMany('App\Models\Admin\Puc\puc_grupo','clase_id','id');
+    }
+    
+    //recibe los parametros del where
+    //ejemplo ->CodigoNombre('name','=','pepe')
+    public function scopeCodigoNombre($query, $condicion)
+    {
+        //de esta manera se obtienen para llenar los registros con blade
+        //return $query->select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre"), "id")->whereRaw($condicion)->orderBy('id', 'asc')->lists('nombre','id');
+
+        //de esta manera se obtienen como tipo json para llenar los registros con jquery
+        return $query->select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre, id"))->whereRaw($condicion)->orderBy('id', 'asc')->get();
+    }
+    /*
+    public function scopeTipoCuenta($query, $tipo){
+        $tipos = config('options.puc_types');
+        if( $tipo != "" && isset($tipos[$tipo]) ){
+            $query->where('tipo','=',$tipo);
+        }
+    }
+    */
 }

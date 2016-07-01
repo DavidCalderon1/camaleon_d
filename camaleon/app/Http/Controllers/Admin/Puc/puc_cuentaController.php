@@ -10,19 +10,40 @@ use Illuminate\Http\Request;
 use Flash;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
-use App\Models\Admin\Puc\puc_grupo;
+use DB;
+use App\Models\Admin\Puc\puc_clase;
+// esta libreria va a dar la facilidad de obtener parametros que se encuentran en nuestra ruta
+use Illuminate\Routing\Route;
 
 class puc_cuentaController extends \App\Http\Controllers\AppBaseController
 {
     /** @var  puc_cuentaRepository */
     private $pucCuentaRepository;
-    private $pucGrupo;
+    private $listClases;
+    private $pucCuenta;
+    private $peticion;
 
-    public function __construct(puc_cuentaRepository $pucCuentaRepo)
+    public function __construct(puc_cuentaRepository $pucCuentaRepo, Request $request)
     {
         $this->pucCuentaRepository = $pucCuentaRepo;
-		//se lista el nombre y el id correspondiente a todos los puc_grupo
-		$this->pucGrupo =  puc_grupo::orderBy('id')->lists('nombre', 'id');
+        //filtro que se ejecutara antes de cualquier accion del controlador, se especifica el metodo en el que se desea ejecutar
+        $this->beforeFilter('@find',['only' => ['edit','show','update','destroy'] ]);
+        $this->beforeFilter('@selection',['only' => ['create','edit'] ]);
+        $this->peticion = "normal";
+        //va a mostrar la vista 'tables' en el caso de ser una peticion de tipo ajax
+        if ($request->ajax() || $request->peticion == "ajax") {
+            $this->peticion = "ajax";
+        }
+    }
+    //metodo find ejecutado por el metodo beforeFilter dentro del constructor
+    public function find(Route $route){
+        //va a buscar los parametros que estan el esta ruta y que son enviados por el recurso, que en este caso es 'cuentas' el configurado en las rutas
+        $this->pucCuenta = $this->pucCuentaRepository->findWithoutFail( $route->getParameter('cuentas') );
+    }
+    //metodo selection ejecutado por el metodo beforeFilter dentro del constructor
+    public function selection(){
+        //se lista el nombre y el id correspondiente a todos los puc_clase
+        $this->listClases =  puc_clase::select(DB::raw("CONCAT(codigo, ' - ', nombre) as nombre, id"))->orderBy('id', 'asc')->lists('nombre','id');
     }
 
     /**
@@ -34,10 +55,19 @@ class puc_cuentaController extends \App\Http\Controllers\AppBaseController
     public function index(Request $request)
     {
         $this->pucCuentaRepository->pushCriteria(new RequestCriteria($request));
-        $pucCuentas = $this->pucCuentaRepository->orderBy('codigo', 'asc')->paginate(15);
+        $pucCuentas = $this->pucCuentaRepository;
+        $vista = "admin.puc.pucCuentas.index";
+        //si hay un request con el nombre busqueda se envia el parametro para realizar la busqueda
+        if ( isset($request->busqueda) ) {
+            $pucCuentas = $pucCuentas->busqueda($request->busqueda);
+        }
+        //si hay un request con el nombre listaid se envia el parametro para realizar la busqueda de todos los registros que tengan la llave foranea con ese valor
+        if ( isset($request->listaid) ) {
+            $pucCuentas = $pucCuentas->listaid($request->listaid);
+        }
 
-        return view('admin.puc.pucCuentas.index')
-            ->with('pucCuentas', $pucCuentas);
+        $pucCuentas = $pucCuentas->orderBy('codigo', 'asc')->paginate(15);
+        return view($vista, ['peticion' => $this->peticion, 'ruta' => 'cuentas', 'nombre' => 'cuenta', 'pucCuentas' => $pucCuentas]);
     }
 
     /**
@@ -47,7 +77,7 @@ class puc_cuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function create()
     {
-        return view('admin.puc.pucCuentas.create')->with('pucGrupo', $this->pucGrupo);
+        return view('admin.puc.pucCuentas.create', ['peticion' => $this->peticion, 'ruta' => 'cuentas', 'nombre' => 'cuenta', 'listClases' => $this->listClases]);
     }
 
     /**
@@ -61,12 +91,11 @@ class puc_cuentaController extends \App\Http\Controllers\AppBaseController
     {
         $input = $request->all();
 
-        $pucCuenta = $this->pucCuentaRepository->create($input);
+        $this->pucCuenta = $this->pucCuentaRepository->create($input);
 
         Flash::success('Cuenta guardada correctamente.');
 
-        //return redirect(route('admin.puc.cuentas.index'));
-		return redirect(route('admin.puc.cuentas.show',$pucCuenta->id) );
+        return redirect(route('admin.puc.cuentas.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -78,15 +107,13 @@ class puc_cuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function show($id)
     {
-        $pucCuenta = $this->pucCuentaRepository->findWithoutFail($id);
-
-        if (empty($pucCuenta)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta no encontrada');
 
             return redirect(route('admin.puc.cuentas.index'));
         }
 
-        return view('admin.puc.pucCuentas.show')->with('pucCuenta', $pucCuenta);
+        return view('admin.puc.pucCuentas.show', ['peticion' => $this->peticion, 'ruta' => 'cuentas', 'nombre' => 'cuenta', 'pucCuenta' => $this->pucCuenta]);
     }
 
     /**
@@ -98,15 +125,18 @@ class puc_cuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function edit($id)
     {
-        $pucCuenta = $this->pucCuentaRepository->findWithoutFail($id);
-
-        if (empty($pucCuenta)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta no encontrada');
 
             return redirect(route('admin.puc.cuentas.index'));
         }
+        $peticion = "normal";
+        //va a mostrar la vista 'tables' en el caso de ser una peticion de tipo ajax
+        if ($request->ajax()) {
+            $peticion = "ajax";
+        }
 
-        return view('admin.puc.pucCuentas.edit', ['pucCuenta' => $pucCuenta, 'pucGrupo' => $this->pucGrupo]);
+        return view('admin.puc.pucCuentas.edit', ['peticion' => $peticion, 'ruta' => 'cuentas', 'nombre' => 'cuenta', 'pucCuenta' => $this->pucCuenta, 'listClases' => $this->listClases]);
     }
 
     /**
@@ -119,30 +149,28 @@ class puc_cuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function update($id, Updatepuc_cuentaRequest $request)
     {
-        $pucCuenta = $this->pucCuentaRepository->findWithoutFail($id);
-		//consulta si existe un registro con el codigo enviado
-		$consultaId = $this->pucCuentaRepository->findWithoutFail($request->codigo);
-		
-        if (empty($pucCuenta)) {
+        //consulta si existe un registro con el codigo enviado
+        $consultaId = $this->pucCuentaRepository->findWithoutFail($request->codigo);
+        
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta no encontrada');
 
             return redirect(route('admin.puc.cuentas.index'));
         }
-		//valida que no exista un registro con el mismo codigo
-		if( count($consultaId) > 0 && $pucCuenta->codigo !== $request->codigo ){
-			Flash::error('Ya existe una Cuenta con ese Código');
-				
-			//regresa al formulario de actualizacion del recurso
-			return redirect(route( 'admin.puc.cuentas.edit',['id' => $id] ));
-				
-		}
+        //valida que no exista un registro con el mismo codigo
+        if( count($consultaId) > 0 && $this->pucCuenta->codigo !== $request->codigo ){
+            Flash::error('Ya existe una Cuenta con ese Código');
+                
+            //regresa al formulario de actualizacion del recurso
+            return redirect(route( 'admin.puc.cuentas.edit',['id' => $id] ));
+                
+        }
 
-        $pucCuenta = $this->pucCuentaRepository->update($request->all(), $id);
+        $this->pucCuenta = $this->pucCuentaRepository->update($request->all(), $id);
 
         Flash::success('Cuenta actualizada correctamente.');
 
-        //return redirect(route('admin.puc.cuentas.index'));
-        return redirect(route('admin.puc.cuentas.show',$pucCuenta->id) );
+        return redirect(route('admin.puc.cuentas.show',['id' => $this->pucCuenta->id, 'peticion' => $this->peticion ]) );
     }
 
     /**
@@ -154,9 +182,7 @@ class puc_cuentaController extends \App\Http\Controllers\AppBaseController
      */
     public function destroy($id)
     {
-        $pucCuenta = $this->pucCuentaRepository->findWithoutFail($id);
-
-        if (empty($pucCuenta)) {
+        if (empty($this->pucCuenta)) {
             Flash::error('Cuenta no encontrada');
 
             return redirect(route('admin.puc.cuentas.index'));

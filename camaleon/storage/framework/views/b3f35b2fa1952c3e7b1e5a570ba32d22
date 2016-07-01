@@ -8,6 +8,7 @@
 		<?php echo $__env->yieldSection(); ?>
 	</head>
 	<body>
+	este es app
 	<div class="container">
 		<?php echo $__env->yieldContent('content'); ?>
 	</div>

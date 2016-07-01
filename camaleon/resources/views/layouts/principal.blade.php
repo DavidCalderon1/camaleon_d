@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Camaleon: Mas que un software contable</title>
+	<title>Camaleon: {{ isset($title_page)? $title_page : 'Mas que un software contable' }}</title>
 	<meta name="description" content="Blueprint: A basic template for a responsive multi-level menu" />
 	<meta name="keywords" content="blueprint, template, html, css, menu, responsive, mobile-friendly" />
 	<meta name="author" content="Codrops" />
@@ -77,7 +77,8 @@
 				<!-------------------------------------------------->
 				<!-- Submenu 1-1 -->
 				<ul data-menu="submenu-1-1" class="menu__level" >
-					<li class="menu__item"><a class="menu__link" href="#"><i class='glyphicon glyphicon-search btn-xs'></i> Buscar</a></li>
+					<li class="menu__item"><a class="menu__link" href={!!URL::to('/admin/puc/crear')!!}><i class='glyphicon glyphicon-plus btn-xs'></i> Creación de cuenta</a></li>
+					<li class="menu__item"><a class="menu__link" href={!!URL::to('/admin/puc/buscar')!!}><i class='glyphicon glyphicon-search btn-xs'></i> Busqueda de cuenta</a></li>
 					<li class="menu__item menu__item_dropdown dropdown_parent">
 						<div class="menu__link_dropdown a">
 							<i class="glyphicon glyphicon-sort-by-attributes btn-xs"><span class="btn-xs">1</span></i>Clase<span class="btn-xs pull-right"><span class="caret "></span></span>
@@ -227,6 +228,7 @@
 			<!-- Ajax loaded content here -->
 			@yield('content')
 		</div>
+		<div class="modal_loading" id="modal_loading"></div>
 	</div>
 	<!-- /view -->
 	
@@ -234,59 +236,68 @@
 	{!! Html::script('assets/js/jquery.min.js') !!}
 	{!! Html::script('assets/js/bootstrap.min.js') !!}
 	
-	<!-- general scripts -->
-	{!! Html::script('/general/js/script.js') !!}
-	
+	<!-- general scripts -->	
+	{!! Html::script('/general/js/script_select_dynamic.js') !!}
+	{!! Html::script('/general/js/script_eliminar_por_ajax.js') !!}
+
 	<!-- menu_multilevel scripts -->
 	{!! Html::script('/menu_multilevel/js/classie.js') !!}
 	{!! Html::script('/menu_multilevel/js/dummydata.js') !!}
 	{!! Html::script('/menu_multilevel/js/main.js') !!}
 	<script>
-	(function() {
-		$('.dropdown_child').hide();
-		$('.dropdown_parent > .a').click(function() {
-			$(this).parent('.dropdown_parent').siblings('.dropdown_parent').find('ul').slideUp();
-			$(this).parent('.dropdown_parent').find('ul').slideToggle();
-		});
-		var menuEl = document.getElementById('ml-menu'),
-			mlmenu = new MLMenu(menuEl, {
-				//breadcrumbsCtrl : true, // show breadcrumbs
-				initialBreadcrumb : 'Inicio', // initial breadcrumb text
-				backCtrl : true, // show back button
-				itemsDelayInterval : 0, // delay between each menu item sliding animation
-				onItemClick: loadDummyData // callback: item that doesn´t have a submenu gets clicked - onItemClick([event], [inner HTML of the clicked item])
+		(function() {
+			$body = $("body");
+			$(document).on({
+			    ajaxStart: function() { $body.addClass("loading");    },
+			     ajaxStop: function() { $body.removeClass("loading"); }    
 			});
+		})();
 
-		// mobile menu toggle
-		var openMenuCtrl = document.querySelector('.action--open'),
-			closeMenuCtrl = document.querySelector('.action--close');
+		(function() {
+			$('.dropdown_child').hide();
+			$('.dropdown_parent > .a').click(function() {
+				$(this).parent('.dropdown_parent').siblings('.dropdown_parent').find('ul').slideUp();
+				$(this).parent('.dropdown_parent').find('ul').slideToggle();
+			});
+			var menuEl = document.getElementById('ml-menu'),
+				mlmenu = new MLMenu(menuEl, {
+					//breadcrumbsCtrl : true, // show breadcrumbs
+					initialBreadcrumb : 'Inicio', // initial breadcrumb text
+					backCtrl : true, // show back button
+					itemsDelayInterval : 0, // delay between each menu item sliding animation
+					onItemClick: loadDummyData // callback: item that doesn´t have a submenu gets clicked - onItemClick([event], [inner HTML of the clicked item])
+				});
 
-		openMenuCtrl.addEventListener('click', openMenu);
-		closeMenuCtrl.addEventListener('click', closeMenu);
+			// mobile menu toggle
+			var openMenuCtrl = document.querySelector('.action--open'),
+				closeMenuCtrl = document.querySelector('.action--close');
 
-		function openMenu() {
-			classie.add(menuEl, 'menu--open');
-		}
+			openMenuCtrl.addEventListener('click', openMenu);
+			closeMenuCtrl.addEventListener('click', closeMenu);
 
-		function closeMenu() {
-			classie.remove(menuEl, 'menu--open');
-		}
+			function openMenu() {
+				classie.add(menuEl, 'menu--open');
+			}
 
-		// simulate grid content loading
-		var gridWrapper = document.querySelector('.content');
+			function closeMenu() {
+				classie.remove(menuEl, 'menu--open');
+			}
 
-		function loadDummyData(ev, itemName) {
-			//ev.preventDefault();
+			// simulate grid content loading
+			var gridWrapper = document.querySelector('.content');
 
-			closeMenu();
-			gridWrapper.innerHTML = '';
-			classie.add(gridWrapper, 'content--loading');
-			setTimeout(function() {
-				classie.remove(gridWrapper, 'content--loading');
-				gridWrapper.innerHTML = '<ul class="products">' + dummyData[itemName] + '<ul>';
-			}, 700);
-		}
-	})();
+			function loadDummyData(ev, itemName) {
+				//ev.preventDefault();
+
+				closeMenu();
+				gridWrapper.innerHTML = '';
+				classie.add(gridWrapper, 'content--loading');
+				setTimeout(function() {
+					classie.remove(gridWrapper, 'content--loading');
+					gridWrapper.innerHTML = '<ul class="products">' + dummyData[itemName] + '<ul>';
+				}, 700);
+			}
+		})();
 	</script>
 	
 	<!-- aqui se mostraran los scripts colocados en las vistas en la misma seccion -->
