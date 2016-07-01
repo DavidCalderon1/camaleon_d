@@ -1,7 +1,7 @@
 <?php
 	// introduccion
 	//¿ que es Laravel?
-	- laravel es un framework de php que trabaj con MVC (Modelo Vista Controlador)
+	- laravel es un framework de php que trabaja con MVC (Modelo Vista Controlador)
 	- tiene una gran influencia de framework como Ruby on Rails y ASP.NET
 	
 	//¿Porque Laravel?
@@ -77,6 +77,13 @@
 	
 	//iniciar la aplicacion
 	php artisan serve
+	
+	//Especificar el host y el puerto por el que se quiere iniciar el servidor
+	php artisan serve --host=some.other.domain --port=8001
+		- se debe agregar el host en el archivo C:\Windows\System32\drivers\etc\host
+	
+	//Muesra una lista de los puertos que estan activos
+		netstat -p TCP -a -n
 	
 	//habilitar la muestra de errores en la aplicacion, hace que al salir un error se vea 
 	//mas especifico el detalle del error, se debe cambiar el parametro false a true
@@ -723,7 +730,8 @@
 		}
 		
 	- luego en la consola:
-		composer update
+		//composer update
+		composer install
 		
 		//(Opcional) asegurarse de que esta instalado el flash package
 		// se puede instalar por el terminal
@@ -789,7 +797,12 @@
 			- los tipos de datos de bd de laravel
 			- los tipos de elementos html (text, number, ...)
 			- las validaciones de laravel
-		- 
+	
+	- Publish Layout, genera los layout principales, como los del login, registro y home
+		http://labs.infyom.com/laravelgenerator/docs/master/publish-layout
+		
+		php artisan infyom.publish:layout
+
 	- API Generator
 		php artisan infyom:api $MODEL_NAME$
 		// donde $MODEL_NAME$ es el nombre del modelo que se quiere
@@ -811,7 +824,7 @@
 		
 	- Generate from Table
 		- crear crud a partir de una tabla existente
-			http://labs.infyom.com/laravelgenerator/docs/options/generator-options
+			http://labs.infyom.com/laravelgenerator/docs/master/generator-options
 			
 			php artisan infyom:scaffold $MODEL_NAME$ --fromTable --tableName=$TABLE_NAME$
 			//ejemplo php artisan infyom:scaffold ciudad --fromTable --tableName=ciudad
@@ -859,7 +872,7 @@
 		- ya estaria funcionando el crud 
 		
 		- el generador, al parecer, no contempla los campos not null de la tabla existente en las validaciones, entonces es necesario agregar las reglas en el modelo
-	
+		
 	- AdminLTE Templates Installation, esto agrega un template para las rutas creadas, un estilo visual de AdminLTE
 	
 		http://labs.infyom.com/laravelgenerator/docs/templates/adminlte
@@ -1215,7 +1228,7 @@
 		//
 	- modificar la vista /usuario/index.blade.php 
 		//al final, antes del fin de la seccion, agregar la instruccion para mostrar los botones de paginacion
-			{!! $users->links() !!}
+			{!! $users->render() !!}
 		@endsection
 		//
 		
@@ -3256,4 +3269,59 @@
 			//
 //FIN DEL CURSO
 https://github.com/RpL02
+
+https://www.openshift.com
+https://openshift.redhat.com
+
+PostgreSQL 9.2 database added.  Please make note of these credentials:
+
+   Root User: adminufdibkj
+   Root Password: G6-sCR86eJwk
+   Database Name: camaleon50
+
+Connection URL: postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT
+
+-----------------------------------------------
+
+Associated with job 'camaleon2-build' in Jenkins server.
+Jenkins created successfully.  Please make note of these credentials:
+
+   User: admin
+   Password: JyNcB7t2TbQP
+
+Note:  You can change your password at: https://jenkins-davidcalderon.rhcloud.com/me/configure
+
+Your application is now building with Jenkins.
+
+-----------------------------------------------
+http://camaleonv1-davidcalderon.rhcloud.com/
+Database: camaleonv1 User: admin5EBXnLp Password: 5yq-PEDLTcdN
+
+MySQL 5.5 database added.  Please make note of these credentials:
+
+       Root User: admin5EBXnLp
+   Root Password: 5yq-PEDLTcdN
+   Database Name: camaleonv1
+
+Connection URL: mysql://$OPENSHIFT_MYSQL_DB_HOST:$OPENSHIFT_MYSQL_DB_PORT/
+
+You can manage your new MySQL database by also embedding phpmyadmin.
+The phpmyadmin username and password will be the same as the MySQL credentials above.
+
+
+Please make note of these MySQL credentials again:
+  Root User: admin5EBXnLp
+  Root Password: 5yq-PEDLTcdN
+URL: https://camaleonv1-davidcalderon.rhcloud.com/phpmyadmin/
+
+
+PostgreSQL 9.2 database added.  Please make note of these credentials:
+
+   Root User: admin94i4g7i
+   Root Password: wRPuu5abyePk
+   Database Name: camaleonv1
+
+Connection URL: postgresql://$OPENSHIFT_POSTGRESQL_DB_HOST:$OPENSHIFT_POSTGRESQL_DB_PORT
+
+
 ?>
